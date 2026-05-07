@@ -3,265 +3,292 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Joe Wei | Academic Performance Tracker</title>
+<title>Joe Wei 九年级成绩趋势报告</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#0f172a;--card:#1e293b;--card2:#334155;--text:#f1f5f9;--muted:#94a3b8;--blue:#3b82f6;--purple:#8b5cf6;--green:#10b981;--amber:#f59e0b;--red:#ef4444;--pink:#ec4899}
-body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-.container{max-width:1280px;margin:0 auto;padding:20px}
-header{text-align:center;padding:40px 0 30px;border-bottom:1px solid var(--card2)}
-header h1{font-size:2.2rem;background:linear-gradient(135deg,var(--blue),var(--purple),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
-header .subtitle{color:var(--muted);font-size:1rem}
-header .meta{margin-top:12px;display:flex;justify-content:center;gap:24px;flex-wrap:wrap}
-header .meta span{background:var(--card);padding:6px 16px;border-radius:20px;font-size:.85rem;color:var(--muted)}
-header .meta span b{color:var(--text)}
+:root{--bg:#0f172a;--card:#1e293b;--card2:#334155;--text:#f1f5f9;--muted:#94a3b8;--blue:#3b82f6;--purple:#8b5cf6;--pink:#ec4899;--green:#10b981;--amber:#f59e0b;--red:#ef4444;--gold:#eab308}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.container{max-width:1200px;margin:0 auto;padding:24px}
 
-/* GPA Trend Section */
-.gpa-trend{margin-top:32px;background:var(--card);border-radius:16px;padding:28px;position:relative;overflow:hidden}
-.gpa-trend::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--blue),var(--purple),var(--pink))}
-.gpa-trend h2{font-size:1.3rem;margin-bottom:20px;display:flex;align-items:center;gap:8px}
-.trend-chart{display:flex;align-items:flex-end;justify-content:center;gap:40px;padding:20px 0}
-.trend-point{text-align:center}
-.trend-bar{width:100px;border-radius:12px 12px 0 0;display:flex;align-items:flex-end;justify-content:center;transition:all .3s;position:relative}
-.trend-bar .val{font-size:1.8rem;font-weight:800;padding:12px 0;position:relative;z-index:1}
-.trend-label{margin-top:10px;font-size:.85rem;color:var(--muted)}
-.trend-delta{font-size:.8rem;margin-top:4px;font-weight:600}
-.delta-up{color:var(--green)}
-.delta-down{color:var(--red)}
+/* Header */
+.header{text-align:center;padding:36px 0 24px}
+.header h1{font-size:1.9rem;font-weight:700;margin-bottom:6px}
+.header .sub{color:var(--muted);font-size:.95rem}
+.header .sub span{margin:0 6px}
 
-/* Category Sections */
-.category-section{margin-top:28px}
-.category-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:8px 0}
-.category-header .dot{width:12px;height:12px;border-radius:50%}
-.category-header h2{font-size:1.2rem}
+/* GPA Cards */
+.gpa-row{display:flex;gap:16px;justify-content:center;margin:28px 0 20px;flex-wrap:wrap}
+.gpa-card{background:var(--card);border-radius:14px;padding:22px 32px;text-align:center;min-width:180px;border:1px solid var(--card2)}
+.gpa-card .label{font-size:.82rem;color:var(--muted);margin-bottom:8px}
+.gpa-card .value{font-size:2.4rem;font-weight:800}
+.gpa-card .delta{font-size:.78rem;margin-top:4px}
 
-/* Subject Cards */
-.subject-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:16px}
-.subject-card{background:var(--card);border-radius:12px;padding:20px;border-left:4px solid var(--card2);transition:transform .2s}
-.subject-card:hover{transform:translateY(-2px)}
-.subject-card .name{font-size:1.05rem;font-weight:600;display:flex;align-items:center;gap:6px;margin-bottom:14px}
-.score-row{display:flex;gap:8px;margin-bottom:12px;align-items:flex-end;height:90px;padding:0 4px}
-.score-bar{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
-.score-bar .bar-val{font-size:.75rem;margin-bottom:3px;font-weight:700}
-.score-bar .bar{width:100%;border-radius:6px 6px 0 0;min-height:6px;transition:height .5s}
-.score-bar .bar-lbl{font-size:.65rem;color:var(--muted);margin-top:4px}
-.score-detail{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-.score-detail .chip{background:var(--card2);padding:3px 10px;border-radius:10px;font-size:.72rem;color:var(--muted)}
-.score-detail .chip b{color:var(--text)}
+/* Legend */
+.legend{display:flex;justify-content:center;gap:20px;margin:16px 0 28px;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--muted)}
+.legend-dot{width:12px;height:12px;border-radius:3px}
 
-/* Highlights Section */
-.highlights{margin-top:32px}
-.highlights h2{font-size:1.3rem;margin-bottom:16px;display:flex;align-items:center;gap:8px}
-.hl-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:16px}
-.hl-card{background:var(--card);border-radius:12px;padding:20px}
-.hl-card h3{font-size:1rem;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--card2)}
-.hl-card .item{padding:6px 0;font-size:.88rem;line-height:1.5}
-.hl-card .item.star{color:var(--green)}
-.hl-card .item.warn{color:var(--amber)}
-.hl-card .item.suggest{color:var(--blue)}
+/* Table */
+.table-wrap{background:var(--card);border-radius:16px;padding:24px;overflow-x:auto;margin-bottom:28px}
+.table-wrap h2{font-size:1.15rem;margin-bottom:16px}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+th{background:var(--card2);padding:10px 10px;text-align:center;font-weight:600;white-space:nowrap;font-size:.78rem}
+th.left{text-align:left}
+td{padding:9px 10px;border-bottom:1px solid rgba(255,255,255,.05);white-space:nowrap;text-align:center;vertical-align:middle}
+td.left{text-align:left}
+tr:hover td{background:rgba(255,255,255,.02)}
 
-/* Trend Table */
-.trend-table{margin-top:32px;background:var(--card);border-radius:16px;padding:24px;overflow-x:auto}
-.trend-table h2{font-size:1.3rem;margin-bottom:16px;display:flex;align-items:center;gap:8px}
-table{width:100%;border-collapse:collapse;font-size:.85rem}
-th{background:var(--card2);padding:10px 12px;text-align:left;font-weight:600;white-space:nowrap}
-td{padding:8px 12px;border-bottom:1px solid var(--card2);white-space:nowrap;vertical-align:middle}
-tr:hover td{background:rgba(255,255,255,.03)}
-.up{color:var(--green);font-weight:600}
-.down{color:var(--red);font-weight:600}
-.mini-bars{display:flex;align-items:flex-end;gap:3px;height:36px;padding:2px 0}
-.mini-bar{width:14px;border-radius:3px 3px 0 0;min-height:3px;transition:height .4s}
+/* Score cells */
+.score-cell{display:flex;flex-direction:column;align-items:center;gap:2px}
+.score-cell .val{font-weight:600;font-size:.88rem}
+.score-cell .chg{font-size:.68rem;font-weight:600}
+.score-bg-green{background:rgba(16,185,129,.1);border-radius:4px;padding:3px 8px}
+.score-bg-red{background:rgba(239,68,68,.1);border-radius:4px;padding:3px 8px}
+.score-bg-gold{background:rgba(234,179,8,.1);border-radius:4px;padding:3px 8px}
+.score-bg-blue{background:rgba(59,130,246,.1);border-radius:4px;padding:3px 8px}
+.chg-up{color:var(--green)}
+.chg-down{color:var(--red)}
+
+/* Mini bars */
+.mini-bars{display:flex;align-items:flex-end;gap:3px;height:32px}
+.mini-bar{width:13px;border-radius:3px 3px 0 0;min-height:3px}
+
+/* Grade badge */
+.grade{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;font-weight:700;font-size:.78rem}
+.grade-a{background:rgba(16,185,129,.2);color:var(--green);border:2px solid var(--green)}
+.grade-b{background:rgba(59,130,246,.2);color:var(--blue);border:2px solid var(--blue)}
+.grade-c{background:rgba(245,158,11,.2);color:var(--amber);border:2px solid var(--amber)}
+
+/* Change arrow */
+.change-up{color:var(--green);font-weight:600}
+.change-down{color:var(--red);font-weight:600}
+
+/* Key Findings */
+.findings{background:var(--card);border-radius:16px;padding:24px;margin-bottom:28px}
+.findings h2{font-size:1.15rem;margin-bottom:16px}
+.finding-item{padding:8px 0;font-size:.88rem;line-height:1.6;display:flex;align-items:flex-start;gap:8px}
+.finding-item .icon{flex-shrink:0;font-size:1rem}
+.finding-up .icon{color:var(--green)}
+.finding-down .icon{color:var(--red)}
+.finding-up{color:var(--green)}
+.finding-down{color:var(--red)}
+
+/* Highlights per semester */
+.hl-section{margin-bottom:28px}
+.hl-section h2{font-size:1.15rem;margin-bottom:14px;display:flex;align-items:center;gap:6px}
+.hl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px}
+.hl-card{background:var(--card);border-radius:12px;padding:18px}
+.hl-card h3{font-size:.92rem;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--card2)}
+.hl-card .item{padding:5px 0;font-size:.84rem;line-height:1.5}
+.hl-star{color:var(--green)}
+.hl-warn{color:var(--amber)}
+.hl-sug{color:var(--blue)}
 
 /* Footer */
-footer{text-align:center;padding:40px 0 20px;color:var(--muted);font-size:.8rem}
+footer{text-align:center;padding:30px 0 16px;color:var(--muted);font-size:.75rem}
 
 @media(max-width:768px){
-  .subject-grid{grid-template-columns:1fr}
-  .hl-cards{grid-template-columns:1fr}
-  .trend-chart{gap:20px}
-  .trend-bar{width:70px}
-  .trend-bar .val{font-size:1.3rem}
+  .gpa-row{flex-direction:column;align-items:center}
+  .hl-grid{grid-template-columns:1fr}
+  .gpa-card{min-width:140px;padding:16px 20px}
+  .gpa-card .value{font-size:1.8rem}
 }
 </style>
 </head>
 <body>
 <div class="container">
-<header>
-  <h1>🎓 Joe Wei 学术成长档案</h1>
-  <p class="subtitle">Academic Performance Tracker — 九年级持续追踪</p>
-  <div class="meta">
-    <span>姓名: <b>魏源 / Joe Wei</b></span>
-    <span>班级: <b>Pre-2</b></span>
-    <span>年级: <b>9th Grade</b></span>
-    <span>最近更新: <b id="lastUpdated"></b></span>
-  </div>
-</header>
 
-<div class="gpa-trend">
-  <h2>📊 总GPA趋势</h2>
-  <div class="trend-chart" id="gpaChart"></div>
+<div class="header">
+  <h1>Joe Wei 九年级成绩趋势报告</h1>
+  <div class="sub">魏源 • Pre-2 • 2024-2025学年</div>
 </div>
 
-<div class="trend-table">
+<div class="gpa-row" id="gpaCards"></div>
+
+<div class="legend" id="legend"></div>
+
+<div class="table-wrap">
   <h2>📋 各科成绩趋势总览</h2>
-  <table id="trendTable"></table>
+  <table id="mainTable"></table>
 </div>
 
-<div id="subjectSections"></div>
+<div class="findings" id="findings"></div>
 
-<div class="highlights">
+<div class="hl-section">
   <h2>💡 各学期关注要点</h2>
-  <div class="hl-cards" id="hlCards"></div>
+  <div class="hl-grid" id="hlCards"></div>
 </div>
 
-<footer>
-  <p>Joe Wei Academic Portfolio · 维护: 六六 (AI) · 每学期自动更新</p>
-</footer>
+<footer>Joe Wei Academic Portfolio • 维护: 六六 (AI) • 每学期自动更新</footer>
+
 </div>
 
 <script src="data.js"></script>
 <script>
-document.getElementById('lastUpdated').textContent = STUDENT.lastUpdated;
-
-// === GPA Trend Chart ===
+// === GPA Cards ===
 (function(){
-  const chart = document.getElementById('gpaChart');
-  const gpaData = SEMESTERS.map(s => ({label:s.label, gpa:s.overall_gpa}));
-  const maxGpa = 4.3;
-  const colors = ['var(--blue)','var(--purple)','var(--pink)','var(--green)','var(--amber)'];
+  const el = document.getElementById('gpaCards');
+  const colors = ['var(--blue)','var(--purple)','var(--pink)'];
+  const labels = SEMESTERS.map(s=>s.label);
+  const gpas = SEMESTERS.map(s=>s.overall_gpa);
   
-  gpaData.forEach((d,i) => {
-    const h = (d.gpa/maxGpa)*200;
-    const prev = i>0 ? gpaData[i-1].gpa : null;
-    const delta = prev!==null ? (d.gpa-prev).toFixed(2) : null;
-    const deltaClass = delta!==null ? (parseFloat(delta)>=0?'delta-up':'delta-down') : '';
-    const deltaText = delta!==null ? (parseFloat(delta)>=0?'↑':'↓')+' '+Math.abs(delta) : '';
-    
-    chart.innerHTML += `
-      <div class="trend-point">
-        <div class="trend-bar" style="height:${h}px;background:${colors[i%colors.length]}20;border:2px solid ${colors[i%colors.length]}">
-          <div class="val" style="color:${colors[i%colors.length]}">${d.gpa}</div>
-        </div>
-        <div class="trend-label">${d.label}</div>
-        ${delta!==null?`<div class="trend-delta ${deltaClass}">${deltaText}</div>`:''}
-      </div>`;
+  gpas.forEach((g,i)=>{
+    const prev = i>0 ? gpas[i-1] : null;
+    const delta = prev!==null ? (g-prev) : null;
+    let deltaHtml = '';
+    if(delta!==null){
+      const cls = delta>=0?'chg-up':'chg-down';
+      const arrow = delta>=0?'↑':'↓';
+      if(i===1) deltaHtml = `<div class="delta ${cls}">${arrow} ${Math.abs(delta).toFixed(2)}</div>`;
+      else deltaHtml = `<div class="delta ${cls}">${arrow} +${Math.abs(delta).toFixed(2)} vs ${labels[0]}</div>`;
+    }
+    el.innerHTML += `<div class="gpa-card">
+      <div class="label">${labels[i]}</div>
+      <div class="value" style="color:${colors[i]}">${g.toFixed(2)}</div>
+      ${deltaHtml}
+    </div>`;
   });
 })();
 
-// === Trend Table ===
+// === Legend ===
 (function(){
-  const table = document.getElementById('trendTable');
-  let html = '<thead><tr><th>科目</th>';
-  SEMESTERS.forEach(s => html += `<th>${s.label} GPA</th>`);
-  html += '<th>整体变化</th><th>趋势图</th></tr></thead><tbody>';
-  
+  const el = document.getElementById('legend');
+  const items = [
+    {color:'var(--blue)',label:'上学期期中'},
+    {color:'var(--purple)',label:'上学期期末'},
+    {color:'var(--pink)',label:'这学期期中'}
+  ];
+  items.forEach(it=>{
+    el.innerHTML += `<div class="legend-item"><div class="legend-dot" style="background:${it.color}"></div>${it.label}</div>`;
+  });
+})();
+
+// === Grade Helper ===
+function getGrade(gpa){
+  if(gpa>=92) return {label:'A',cls:'grade-a'};
+  if(gpa>=85) return {label:'B',cls:'grade-b'};
+  return {label:'C',cls:'grade-c'};
+}
+function scoreBgClass(val,prev){
+  if(prev===null) return val>=90?'score-bg-gold':'score-bg-blue';
+  const d = val - prev;
+  if(d>2) return 'score-bg-green';
+  if(d<-2) return 'score-bg-red';
+  return 'score-bg-blue';
+}
+
+// === Main Table ===
+(function(){
+  const table = document.getElementById('mainTable');
   const barColors = [
-    {bg:'rgba(59,130,246,0.5)', bd:'rgba(59,130,246,0.9)'},
-    {bg:'rgba(139,92,246,0.5)', bd:'rgba(139,92,246,0.9)'},
-    {bg:'rgba(236,72,153,0.5)', bd:'rgba(236,72,153,0.9)'}
+    {bg:'rgba(59,130,246,0.45)',bd:'rgba(59,130,246,0.85)'},
+    {bg:'rgba(139,92,246,0.45)',bd:'rgba(139,92,246,0.85)'},
+    {bg:'rgba(236,72,153,0.45)',bd:'rgba(236,72,153,0.85)'}
   ];
   
-  SUBJECTS.forEach(sub => {
-    const vals = SEMESTERS.map(s => s.scores[sub.id]?.gpa);
-    const first = vals.find(v => v!==null);
-    const last = [...vals].reverse().find(v => v!==null);
-    const change = first!==null && last!==null ? (last-first).toFixed(1) : '—';
-    const isUp = change!=='—' && parseFloat(change)>0;
-    const isDown = change!=='—' && parseFloat(change)<0;
+  let html = '<thead><tr><th class="left">科目</th>';
+  SEMESTERS.forEach(s=> html += `<th>${s.shortLabel}</th>`);
+  html += '<th>趋势图</th><th>上学期学期GPA</th><th>整体变化</th><th>等级</th></tr></thead><tbody>';
+  
+  SUBJECTS.forEach(sub=>{
+    const vals = SEMESTERS.map(s=>s.scores[sub.id]?.gpa);
+    const first = vals.find(v=>v!==null);
+    const last = [...vals].reverse().find(v=>v!==null);
+    const change = first!==null&&last!==null ? (last-first) : null;
+    const isUp = change!==null && change>0;
+    const isDown = change!==null && change<0;
     
-    html += `<tr><td>${sub.icon} ${sub.name}</td>`;
-    vals.forEach(v => html += `<td>${v!==null?v:'—'}</td>`);
-    html += `<td class="${isUp?'up':isDown?'down':''}">${change!=='—'?(isUp?'▲ +':'▼ ')+Math.abs(change):change}</td>`;
+    // Semester GPA
+    const semGpa = SEMESTER_COMPOSITE.sem1.scores[sub.id];
+    
+    // Grade from latest value
+    const latestVal = last || 0;
+    const grade = getGrade(latestVal);
+    
+    html += `<tr><td class="left">${sub.icon} ${sub.name}</td>`;
+    
+    // Score cells with delta
+    vals.forEach((v,i)=>{
+      if(v===null){ html+='<td>—</td>'; return; }
+      const prev = i>0 ? vals[i-1] : null;
+      const delta = prev!==null ? (v-prev) : null;
+      let chgHtml = '';
+      if(delta!==null){
+        const cls = delta>=0?'chg-up':'chg-down';
+        const sign = delta>=0?'+':'';
+        chgHtml = `<span class="chg ${cls}">${sign}${delta.toFixed(1)}</span>`;
+      }
+      const bgCls = scoreBgClass(v, prev);
+      html += `<td><div class="score-cell ${bgCls}"><span class="val">${v}</span>${chgHtml}</div></td>`;
+    });
     
     // Mini bar chart
     html += '<td><div class="mini-bars">';
-    vals.forEach((v,i) => {
-      if(v===null) { html += `<div class="mini-bar" style="height:3px;background:${barColors[i].bg};border:1px solid ${barColors[i].bd};opacity:0.3"></div>`; return; }
-      const h = Math.max(4, ((v-50)/50)*32);
+    vals.forEach((v,i)=>{
+      if(v===null){ html+=`<div class="mini-bar" style="height:3px;background:${barColors[i].bg};border:1px solid ${barColors[i].bd};opacity:.3"></div>`; return; }
+      const h = Math.max(4,((v-50)/50)*28);
       html += `<div class="mini-bar" style="height:${h}px;background:${barColors[i].bg};border:1.5px solid ${barColors[i].bd}"></div>`;
     });
-    html += '</div></td></tr>';
+    html += '</div></td>';
+    
+    // Semester GPA
+    html += `<td style="font-weight:600">${semGpa||'—'}</td>`;
+    
+    // Change
+    if(change!==null){
+      const cls = isUp?'change-up':'change-down';
+      const arrow = isUp?'▲':'▼';
+      const sign = isUp?'+':'';
+      html += `<td class="${cls}">${arrow} ${sign}${change.toFixed(1)}</td>`;
+    } else {
+      html += '<td>—</td>';
+    }
+    
+    // Grade badge
+    html += `<td><span class="grade ${grade.cls}">${grade.label}</span></td>`;
+    html += '</tr>';
   });
   
   html += '</tbody>';
   table.innerHTML = html;
 })();
 
-// === Subject Detail Cards ===
+// === Key Findings ===
 (function(){
-  const container = document.getElementById('subjectSections');
-  const catOrder = ['language','humanities','science','elective'];
+  const el = document.getElementById('findings');
+  const items = [
+    {up:true, text:'心理学持续飙升：88.5→95.6→99.0，两学期累计+10.5分，目前各科最高'},
+    {up:true, text:'社科大幅进步：79.3→89.9→91.4，累计+12.1分，进步幅度全科目最大'},
+    {up:true, text:'地理稳步上升：88.6→93.1→95.5，每个阶段都在进步'},
+    {up:true, text:'化学持续走高：92.2→93.8→95.8，稳步攀升'},
+    {up:true, text:'生物稳定提升：87.3→91.5→92.5，累计+5.2分'},
+    {up:true, text:'EAL整体上升：85.4→90.0→88.8，累计+3.4分，但Exam仍偏弱(79.8)'},
+    {up:false, text:'物理出现下滑：98.5→94.0→93.4，两学期累计-5.1分，需重点关注'},
+    {up:false, text:'代数2波动：89.4→95.7→92.9，期末冲高后这学期期中回落2.8分'},
+    {up:false, text:'Art整体下行：94.3→90.3→91.2，累计-3.1分'}
+  ];
   
-  catOrder.forEach(catId => {
-    const cat = CATEGORIES[catId];
-    const subs = SUBJECTS.filter(s => s.category===catId);
-    
-    let section = `<div class="category-section">
-      <div class="category-header">
-        <div class="dot" style="background:${cat.color}"></div>
-        <h2>${cat.label}</h2>
-      </div>
-      <div class="subject-grid">`;
-    
-    subs.forEach(sub => {
-      const vals = SEMESTERS.map(s => s.scores[sub.id]?.gpa).filter(v=>v!==null);
-      const maxV = Math.max(...vals);
-      const barColors = ['var(--blue)','var(--purple)','var(--pink)'];
-      
-      let card = `<div class="subject-card" style="border-left-color:${cat.color}">
-        <div class="name">${sub.icon} ${sub.name}</div>
-        <div class="score-row">`;
-      
-      SEMESTERS.forEach((s,i) => {
-        const v = s.scores[sub.id]?.gpa;
-        if(v===null) return;
-        const h = Math.max(8, ((v-50)/50)*70);
-        const bgMap = ['rgba(59,130,246,0.35)','rgba(139,92,246,0.35)','rgba(236,72,153,0.35)'];
-        const bdMap = ['rgba(59,130,246,0.8)','rgba(139,92,246,0.8)','rgba(236,72,153,0.8)'];
-        card += `<div class="score-bar">
-          <div class="bar-val" style="color:${bdMap[i]}">${v}</div>
-          <div class="bar" style="height:${h}px;background:${bgMap[i]};border:1.5px solid ${bdMap[i]}"></div>
-          <div class="bar-lbl">${s.shortLabel}</div>
-        </div>`;
-      });
-      
-      card += `</div>`;
-      
-      // Latest semester detail scores
-      const latest = SEMESTERS[SEMESTERS.length-1].scores[sub.id];
-      if(latest && latest.exam !== null) {
-        card += `<div class="score-detail">
-          <div class="chip">出勤 <b>${latest.attendance??'—'}</b></div>
-          <div class="chip">参与 <b>${latest.participation??'—'}</b></div>
-          <div class="chip">作业 <b>${latest.homework??'—'}</b></div>
-          <div class="chip">考试 <b>${latest.exam??'—'}</b></div>
-        </div>`;
-      }
-      
-      card += `</div>`;
-      section += card;
-    });
-    
-    section += `</div></div>`;
-    container.innerHTML += section;
+  let html = '<h2>🔑 关键发现与建议</h2>';
+  items.forEach(it=>{
+    const cls = it.up?'finding-up':'finding-down';
+    const icon = it.up?'↑':'↓';
+    html += `<div class="finding-item ${cls}"><span class="icon">${icon}</span><span>${it.text}</span></div>`;
   });
+  el.innerHTML = html;
 })();
 
 // === Highlights Cards ===
 (function(){
-  const container = document.getElementById('hlCards');
+  const el = document.getElementById('hlCards');
   const semLabels = {sem1_mid:'上学期期中',sem1_final:'上学期期末',sem2_mid:'下学期期中'};
   
-  Object.entries(HIGHLIGHTS).forEach(([key,hl]) => {
-    let card = `<div class="hl-card">
-      <h3>📌 ${semLabels[key]||key}</h3>`;
-    
-    if(hl.stars) hl.stars.forEach(s => card += `<div class="item star">${s}</div>`);
-    if(hl.warnings) hl.warnings.forEach(w => card += `<div class="item warn">${w}</div>`);
-    if(hl.suggestions) hl.suggestions.forEach(g => card += `<div class="item suggest">${g}</div>`);
-    
-    card += `</div>`;
-    container.innerHTML += card;
+  Object.entries(HIGHLIGHTS).forEach(([key,hl])=>{
+    let card = `<div class="hl-card"><h3>📌 ${semLabels[key]||key}</h3>`;
+    if(hl.stars) hl.stars.forEach(s=> card += `<div class="item hl-star">${s}</div>`);
+    if(hl.warnings) hl.warnings.forEach(w=> card += `<div class="item hl-warn">${w}</div>`);
+    if(hl.suggestions) hl.suggestions.forEach(g=> card += `<div class="item hl-sug">${g}</div>`);
+    card += '</div>';
+    el.innerHTML += card;
   });
 })();
 </script>
