@@ -65,10 +65,12 @@ header .meta span b{color:var(--text)}
 .trend-table h2{font-size:1.3rem;margin-bottom:16px;display:flex;align-items:center;gap:8px}
 table{width:100%;border-collapse:collapse;font-size:.85rem}
 th{background:var(--card2);padding:10px 12px;text-align:left;font-weight:600;white-space:nowrap}
-td{padding:8px 12px;border-bottom:1px solid var(--card2);white-space:nowrap}
+td{padding:8px 12px;border-bottom:1px solid var(--card2);white-space:nowrap;vertical-align:middle}
 tr:hover td{background:rgba(255,255,255,.03)}
 .up{color:var(--green);font-weight:600}
 .down{color:var(--red);font-weight:600}
+.mini-bars{display:flex;align-items:flex-end;gap:3px;height:36px;padding:2px 0}
+.mini-bar{width:14px;border-radius:3px 3px 0 0;min-height:3px;transition:height .4s}
 
 /* Footer */
 footer{text-align:center;padding:40px 0 20px;color:var(--muted);font-size:.8rem}
@@ -151,7 +153,13 @@ document.getElementById('lastUpdated').textContent = STUDENT.lastUpdated;
   const table = document.getElementById('trendTable');
   let html = '<thead><tr><th>科目</th>';
   SEMESTERS.forEach(s => html += `<th>${s.label} GPA</th>`);
-  html += '<th>整体变化</th><th>趋势</th></tr></thead><tbody>';
+  html += '<th>整体变化</th><th>趋势图</th></tr></thead><tbody>';
+  
+  const barColors = [
+    {bg:'rgba(59,130,246,0.5)', bd:'rgba(59,130,246,0.9)'},
+    {bg:'rgba(139,92,246,0.5)', bd:'rgba(139,92,246,0.9)'},
+    {bg:'rgba(236,72,153,0.5)', bd:'rgba(236,72,153,0.9)'}
+  ];
   
   SUBJECTS.forEach(sub => {
     const vals = SEMESTERS.map(s => s.scores[sub.id]?.gpa);
@@ -160,12 +168,19 @@ document.getElementById('lastUpdated').textContent = STUDENT.lastUpdated;
     const change = first!==null && last!==null ? (last-first).toFixed(1) : '—';
     const isUp = change!=='—' && parseFloat(change)>0;
     const isDown = change!=='—' && parseFloat(change)<0;
-    const cat = CATEGORIES[sub.category];
     
     html += `<tr><td>${sub.icon} ${sub.name}</td>`;
     vals.forEach(v => html += `<td>${v!==null?v:'—'}</td>`);
-    html += `<td class="${isUp?'up':isDown?'down':''}">${change!=='—'?(isUp?'+':'')+change:change}</td>`;
-    html += `<td>${isUp?'📈':isDown?'⚠️':'—'}</td></tr>`;
+    html += `<td class="${isUp?'up':isDown?'down':''}">${change!=='—'?(isUp?'▲ +':'▼ ')+Math.abs(change):change}</td>`;
+    
+    // Mini bar chart
+    html += '<td><div class="mini-bars">';
+    vals.forEach((v,i) => {
+      if(v===null) { html += `<div class="mini-bar" style="height:3px;background:${barColors[i].bg};border:1px solid ${barColors[i].bd};opacity:0.3"></div>`; return; }
+      const h = Math.max(4, ((v-50)/50)*32);
+      html += `<div class="mini-bar" style="height:${h}px;background:${barColors[i].bg};border:1.5px solid ${barColors[i].bd}"></div>`;
+    });
+    html += '</div></td></tr>';
   });
   
   html += '</tbody>';
