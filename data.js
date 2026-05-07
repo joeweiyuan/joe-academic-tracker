@@ -97,7 +97,7 @@ const SEMESTERS = [
       eal:        { gpa: 88.8,  attendance: 100, participation: 99.5, homework: 94.7,  exam: 79.8 },
       social:     { gpa: 91.4,  attendance: 100, participation: 88,   homework: 84.5,  exam: 92.6 },
       geography:  { gpa: 95.5,  attendance: 100, participation: 82.5, homework: 95.6,  exam: 98 },
-      psychology: { gpa: 99.0,  attendance: 100, participation: 90.5, homework: 95,    exam: 92.8 },
+      psychology: { gpa: 99.0,  attendance: 100,   participation: 94,   homework: 99.3,  exam: 100 },
       algebra2:   { gpa: 92.9,  attendance: 100, participation: 90.5, homework: 96.6,  exam: 90 },
       physics:    { gpa: 93.4,  attendance: 100, participation: 97,   homework: 99.2,  exam: 88 },
       chemistry:  { gpa: 95.8,  attendance: 100, participation: 97.5, homework: 98.6,  exam: 93 },
@@ -167,7 +167,7 @@ const HIGHLIGHTS = {
   },
   sem2_mid: {
     stars: [
-      "🏆🏆 心理学99.0分，接近满分！累计提升10.5分",
+      "🏆🏆 心理学99.0分，接近满分！出勤100+参与94+作业99.3+考试100，全科最均衡",
       "🚀 社科91.4分，累计提升12.1分，进步最大",
       "📈 整体GPA达到3.91，持续上升",
       "🌟 地理95.5分，三阶段稳步攀升",
