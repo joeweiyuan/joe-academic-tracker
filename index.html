@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Joe Wei | Academic Performance Tracker</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f172a;--card:#1e293b;--card2:#334155;--text:#f1f5f9;--muted:#94a3b8;--blue:#3b82f6;--purple:#8b5cf6;--green:#10b981;--amber:#f59e0b;--red:#ef4444;--pink:#ec4899}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.container{max-width:1280px;margin:0 auto;padding:20px}
+header{text-align:center;padding:40px 0 30px;border-bottom:1px solid var(--card2)}
+header h1{font-size:2.2rem;background:linear-gradient(135deg,var(--blue),var(--purple),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+header .subtitle{color:var(--muted);font-size:1rem}
+header .meta{margin-top:12px;display:flex;justify-content:center;gap:24px;flex-wrap:wrap}
+header .meta span{background:var(--card);padding:6px 16px;border-radius:20px;font-size:.85rem;color:var(--muted)}
+header .meta span b{color:var(--text)}
+
+/* GPA Trend Section */
+.gpa-trend{margin-top:32px;background:var(--card);border-radius:16px;padding:28px;position:relative;overflow:hidden}
+.gpa-trend::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--blue),var(--purple),var(--pink))}
+.gpa-trend h2{font-size:1.3rem;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+.trend-chart{display:flex;align-items:flex-end;justify-content:center;gap:40px;padding:20px 0}
+.trend-point{text-align:center}
+.trend-bar{width:100px;border-radius:12px 12px 0 0;display:flex;align-items:flex-end;justify-content:center;transition:all .3s;position:relative}
+.trend-bar .val{font-size:1.8rem;font-weight:800;padding:12px 0;position:relative;z-index:1}
+.trend-label{margin-top:10px;font-size:.85rem;color:var(--muted)}
+.trend-delta{font-size:.8rem;margin-top:4px;font-weight:600}
+.delta-up{color:var(--green)}
+.delta-down{color:var(--red)}
+
+/* Category Sections */
+.category-section{margin-top:28px}
+.category-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:8px 0}
+.category-header .dot{width:12px;height:12px;border-radius:50%}
+.category-header h2{font-size:1.2rem}
+
+/* Subject Cards */
+.subject-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:16px}
+.subject-card{background:var(--card);border-radius:12px;padding:20px;border-left:4px solid var(--card2);transition:transform .2s}
+.subject-card:hover{transform:translateY(-2px)}
+.subject-card .name{font-size:1.05rem;font-weight:600;display:flex;align-items:center;gap:6px;margin-bottom:14px}
+.score-row{display:flex;gap:8px;margin-bottom:12px;align-items:flex-end;height:90px;padding:0 4px}
+.score-bar{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
+.score-bar .bar-val{font-size:.75rem;margin-bottom:3px;font-weight:700}
+.score-bar .bar{width:100%;border-radius:6px 6px 0 0;min-height:6px;transition:height .5s}
+.score-bar .bar-lbl{font-size:.65rem;color:var(--muted);margin-top:4px}
+.score-detail{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.score-detail .chip{background:var(--card2);padding:3px 10px;border-radius:10px;font-size:.72rem;color:var(--muted)}
+.score-detail .chip b{color:var(--text)}
+
+/* Highlights Section */
+.highlights{margin-top:32px}
+.highlights h2{font-size:1.3rem;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.hl-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:16px}
+.hl-card{background:var(--card);border-radius:12px;padding:20px}
+.hl-card h3{font-size:1rem;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--card2)}
+.hl-card .item{padding:6px 0;font-size:.88rem;line-height:1.5}
+.hl-card .item.star{color:var(--green)}
+.hl-card .item.warn{color:var(--amber)}
+.hl-card .item.suggest{color:var(--blue)}
+
+/* Trend Table */
+.trend-table{margin-top:32px;background:var(--card);border-radius:16px;padding:24px;overflow-x:auto}
+.trend-table h2{font-size:1.3rem;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+th{background:var(--card2);padding:10px 12px;text-align:left;font-weight:600;white-space:nowrap}
+td{padding:8px 12px;border-bottom:1px solid var(--card2);white-space:nowrap}
+tr:hover td{background:rgba(255,255,255,.03)}
+.up{color:var(--green);font-weight:600}
+.down{color:var(--red);font-weight:600}
+
+/* Footer */
+footer{text-align:center;padding:40px 0 20px;color:var(--muted);font-size:.8rem}
+
+@media(max-width:768px){
+  .subject-grid{grid-template-columns:1fr}
+  .hl-cards{grid-template-columns:1fr}
+  .trend-chart{gap:20px}
+  .trend-bar{width:70px}
+  .trend-bar .val{font-size:1.3rem}
+}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+  <h1>🎓 Joe Wei 学术成长档案</h1>
+  <p class="subtitle">Academic Performance Tracker — 九年级持续追踪</p>
+  <div class="meta">
+    <span>姓名: <b>魏源 / Joe Wei</b></span>
+    <span>班级: <b>Pre-2</b></span>
+    <span>年级: <b>9th Grade</b></span>
+    <span>最近更新: <b id="lastUpdated"></b></span>
+  </div>
+</header>
+
+<div class="gpa-trend">
+  <h2>📊 总GPA趋势</h2>
+  <div class="trend-chart" id="gpaChart"></div>
+</div>
+
+<div class="trend-table">
+  <h2>📋 各科成绩趋势总览</h2>
+  <table id="trendTable"></table>
+</div>
+
+<div id="subjectSections"></div>
+
+<div class="highlights">
+  <h2>💡 各学期关注要点</h2>
+  <div class="hl-cards" id="hlCards"></div>
+</div>
+
+<footer>
+  <p>Joe Wei Academic Portfolio · 维护: 六六 (AI) · 每学期自动更新</p>
+</footer>
+</div>
+
+<script src="data.js"></script>
+<script>
+document.getElementById('lastUpdated').textContent = STUDENT.lastUpdated;
+
+// === GPA Trend Chart ===
+(function(){
+  const chart = document.getElementById('gpaChart');
+  const gpaData = SEMESTERS.map(s => ({label:s.label, gpa:s.overall_gpa}));
+  const maxGpa = 4.3;
+  const colors = ['var(--blue)','var(--purple)','var(--pink)','var(--green)','var(--amber)'];
+  
+  gpaData.forEach((d,i) => {
+    const h = (d.gpa/maxGpa)*200;
+    const prev = i>0 ? gpaData[i-1].gpa : null;
+    const delta = prev!==null ? (d.gpa-prev).toFixed(2) : null;
+    const deltaClass = delta!==null ? (parseFloat(delta)>=0?'delta-up':'delta-down') : '';
+    const deltaText = delta!==null ? (parseFloat(delta)>=0?'↑':'↓')+' '+Math.abs(delta) : '';
+    
+    chart.innerHTML += `
+      <div class="trend-point">
+        <div class="trend-bar" style="height:${h}px;background:${colors[i%colors.length]}20;border:2px solid ${colors[i%colors.length]}">
+          <div class="val" style="color:${colors[i%colors.length]}">${d.gpa}</div>
+        </div>
+        <div class="trend-label">${d.label}</div>
+        ${delta!==null?`<div class="trend-delta ${deltaClass}">${deltaText}</div>`:''}
+      </div>`;
+  });
+})();
+
+// === Trend Table ===
+(function(){
+  const table = document.getElementById('trendTable');
+  let html = '<thead><tr><th>科目</th>';
+  SEMESTERS.forEach(s => html += `<th>${s.label} GPA</th>`);
+  html += '<th>整体变化</th><th>趋势</th></tr></thead><tbody>';
+  
+  SUBJECTS.forEach(sub => {
+    const vals = SEMESTERS.map(s => s.scores[sub.id]?.gpa);
+    const first = vals.find(v => v!==null);
+    const last = [...vals].reverse().find(v => v!==null);
+    const change = first!==null && last!==null ? (last-first).toFixed(1) : '—';
+    const isUp = change!=='—' && parseFloat(change)>0;
+    const isDown = change!=='—' && parseFloat(change)<0;
+    const cat = CATEGORIES[sub.category];
+    
+    html += `<tr><td>${sub.icon} ${sub.name}</td>`;
+    vals.forEach(v => html += `<td>${v!==null?v:'—'}</td>`);
+    html += `<td class="${isUp?'up':isDown?'down':''}">${change!=='—'?(isUp?'+':'')+change:change}</td>`;
+    html += `<td>${isUp?'📈':isDown?'⚠️':'—'}</td></tr>`;
+  });
+  
+  html += '</tbody>';
+  table.innerHTML = html;
+})();
+
+// === Subject Detail Cards ===
+(function(){
+  const container = document.getElementById('subjectSections');
+  const catOrder = ['language','humanities','science','elective'];
+  
+  catOrder.forEach(catId => {
+    const cat = CATEGORIES[catId];
+    const subs = SUBJECTS.filter(s => s.category===catId);
+    
+    let section = `<div class="category-section">
+      <div class="category-header">
+        <div class="dot" style="background:${cat.color}"></div>
+        <h2>${cat.label}</h2>
+      </div>
+      <div class="subject-grid">`;
+    
+    subs.forEach(sub => {
+      const vals = SEMESTERS.map(s => s.scores[sub.id]?.gpa).filter(v=>v!==null);
+      const maxV = Math.max(...vals);
+      const barColors = ['var(--blue)','var(--purple)','var(--pink)'];
+      
+      let card = `<div class="subject-card" style="border-left-color:${cat.color}">
+        <div class="name">${sub.icon} ${sub.name}</div>
+        <div class="score-row">`;
+      
+      SEMESTERS.forEach((s,i) => {
+        const v = s.scores[sub.id]?.gpa;
+        if(v===null) return;
+        const h = Math.max(8, ((v-50)/50)*70);
+        const bgMap = ['rgba(59,130,246,0.35)','rgba(139,92,246,0.35)','rgba(236,72,153,0.35)'];
+        const bdMap = ['rgba(59,130,246,0.8)','rgba(139,92,246,0.8)','rgba(236,72,153,0.8)'];
+        card += `<div class="score-bar">
+          <div class="bar-val" style="color:${bdMap[i]}">${v}</div>
+          <div class="bar" style="height:${h}px;background:${bgMap[i]};border:1.5px solid ${bdMap[i]}"></div>
+          <div class="bar-lbl">${s.shortLabel}</div>
+        </div>`;
+      });
+      
+      card += `</div>`;
+      
+      // Latest semester detail scores
+      const latest = SEMESTERS[SEMESTERS.length-1].scores[sub.id];
+      if(latest && latest.exam !== null) {
+        card += `<div class="score-detail">
+          <div class="chip">出勤 <b>${latest.attendance??'—'}</b></div>
+          <div class="chip">参与 <b>${latest.participation??'—'}</b></div>
+          <div class="chip">作业 <b>${latest.homework??'—'}</b></div>
+          <div class="chip">考试 <b>${latest.exam??'—'}</b></div>
+        </div>`;
+      }
+      
+      card += `</div>`;
+      section += card;
+    });
+    
+    section += `</div></div>`;
+    container.innerHTML += section;
+  });
+})();
+
+// === Highlights Cards ===
+(function(){
+  const container = document.getElementById('hlCards');
+  const semLabels = {sem1_mid:'上学期期中',sem1_final:'上学期期末',sem2_mid:'下学期期中'};
+  
+  Object.entries(HIGHLIGHTS).forEach(([key,hl]) => {
+    let card = `<div class="hl-card">
+      <h3>📌 ${semLabels[key]||key}</h3>`;
+    
+    if(hl.stars) hl.stars.forEach(s => card += `<div class="item star">${s}</div>`);
+    if(hl.warnings) hl.warnings.forEach(w => card += `<div class="item warn">${w}</div>`);
+    if(hl.suggestions) hl.suggestions.forEach(g => card += `<div class="item suggest">${g}</div>`);
+    
+    card += `</div>`;
+    container.innerHTML += card;
+  });
+})();
+</script>
+</body>
+</html>
