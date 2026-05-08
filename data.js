@@ -16,7 +16,7 @@ const STUDENT = {
   school: "International School",
   grade: "9th Grade",
   target: "University Admission Academic Portfolio",
-  lastUpdated: "2025-05-07"
+  lastUpdated: "2025-05-08"
 };
 
 const SUBJECTS = [
@@ -102,8 +102,8 @@ const SEMESTERS = [
       physics:    { gpa: 93.4,  attendance: 100, participation: 97,   homework: 99.2,  exam: 88 },
       chemistry:  { gpa: 95.8,  attendance: 100, participation: 97.5, homework: 98.6,  exam: 93 },
       biology:    { gpa: 92.5,  attendance: 100, participation: 93,   homework: 98.9,  exam: 87.5 },
-      art:        { gpa: 91.2,  attendance: 100, participation: 90,   homework: 89.3,  exam: 97 },
-      pe:         { gpa: null,  attendance: null, participation: null, homework: null,  exam: null }
+      art:        { gpa: 91.2,  attendance: 100, participation: 90,   homework: 89.3,  exam: null },
+      pe:         { gpa: 97,   attendance: 100, participation: 95,   homework: null,  exam: null }
     }
   }
 ];
@@ -168,7 +168,7 @@ const HIGHLIGHTS = {
   sem2_mid: {
     stars: [
       "🏆🏆 心理学99.0分，接近满分！出勤100+参与94+作业99.3+考试100，全科最均衡",
-      "🚀 社科91.4分，累计提升12.1分，进步最大",
+      "🚀 社科91.4分，vs上学期期末提升1.5分，vs上学期期中累计+12.1分",
       "📈 整体GPA达到3.91，持续上升",
       "🌟 地理95.5分，三阶段稳步攀升",
       "🧪 化学95.8分，持续走高",
@@ -178,12 +178,12 @@ const HIGHLIGHTS = {
       "⚠️ 物理持续下滑：98.5→94.0→93.4，累计-5.1分",
       "⚠️ 代数2波动回落：95.7→92.9（-2.8），需稳住",
       "⚠️ EAL Exam仅79.8分，考试依然是短板",
-      "⚠️ Art整体下行：94.3→90.3→91.2（-3.1）"
+      "⚠️ Art整体下行：94.3→90.3→91.2（-3.1），课堂表现和作业是主要失分项"
     ],
     suggestions: [
       "🔴 紧急：物理需重点关注，建议与老师沟通找原因",
       "🟡 代数2需巩固，避免继续下滑",
-      "🟢 心理学和社科保持现有学习方法",
+      "🟢 心理学保持现有学习方法，社科需提升课堂表现和作业质量",
       "🔵 EAL需重点突破考试技巧，课堂表现已非常优秀"
     ]
   }
