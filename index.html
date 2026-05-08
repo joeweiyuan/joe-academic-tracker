@@ -51,6 +51,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .grade{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;font-weight:700;font-size:.78rem}
 .grade-a{background:rgba(16,185,129,.2);color:var(--green);border:2px solid var(--green)}
 .grade-b{background:rgba(59,130,246,.2);color:var(--blue);border:2px solid var(--blue)}
+.grade-c{background:rgba(245,158,11,.2);color:var(--amber);border:2px solid var(--amber)}
 
 .change-up{color:var(--green);font-weight:600}
 .change-down{color:var(--red);font-weight:600}
@@ -111,7 +112,7 @@ footer{text-align:center;padding:30px 0 16px;color:var(--muted);font-size:.75rem
 </div>
 
 <div class="section">
-  <h2>🔍 四维度提分分析 <span style="font-size:.78rem;color:var(--muted);font-weight:400">（出勤15% + 课堂表现15% + 作业20% + 考试50%）</span></h2>
+  <h2>🔍 四维度提分分析 <span style="font-size:.78rem;color:var(--muted);font-weight:400">（基础权重: 出勤15% + 课堂表现15% + 作业20% + 考试50%，无考试项时自动重分配权重）</span></h2>
   <div class="dim-grid" id="dimCards"></div>
 </div>
 
@@ -142,8 +143,7 @@ footer{text-align:center;padding:30px 0 16px;color:var(--muted);font-size:.75rem
     if(delta!==null){
       const cls = delta>=0?'chg-up':'chg-down';
       const arrow = delta>=0?'↑':'↓';
-      if(i===1) deltaHtml = `<div class="delta ${cls}">${arrow} ${Math.abs(delta).toFixed(2)}</div>`;
-      else deltaHtml = `<div class="delta ${cls}">${arrow} +${Math.abs(delta).toFixed(2)} vs ${labels[0]}</div>`;
+      deltaHtml = `<div class="delta ${cls}">${arrow} ${delta>=0?'+':''}${delta.toFixed(2)} vs ${labels[i-1]}</div>`;
     }
     el.innerHTML += `<div class="gpa-card"><div class="label">${labels[i]}</div><div class="value" style="color:${colors[i]}">${g.toFixed(2)}</div>${deltaHtml}</div>`;
   });
@@ -157,7 +157,7 @@ footer{text-align:center;padding:30px 0 16px;color:var(--muted);font-size:.75rem
   });
 })();
 
-function getGrade(gpa){ return gpa>=92?{label:'A',cls:'grade-a'}:{label:'B',cls:'grade-b'}; }
+function getGrade(gpa){ return gpa>=90?{label:'A',cls:'grade-a'}:gpa>=80?{label:'B',cls:'grade-b'}:{label:'C',cls:'grade-c'}; }
 function scoreBgClass(val,prev){
   if(prev===null) return val>=90?'score-bg-gold':'score-bg-blue';
   const d=val-prev; return d>2?'score-bg-green':d<-2?'score-bg-red':'score-bg-blue';
@@ -224,10 +224,10 @@ function scoreBgClass(val,prev){
 (function(){
   const el = document.getElementById('dimCards');
   const DIMS = [
-    {key:'attendance',   label:'出勤',     weight:0.15, color:'var(--blue)'},
-    {key:'participation',label:'课堂表现', weight:0.15, color:'var(--purple)'},
-    {key:'homework',     label:'作业',     weight:0.20, color:'var(--amber)'},
-    {key:'exam',         label:'考试',     weight:0.50, color:'var(--pink)'}
+    {key:'attendance',   label:'出勤',     baseWeight:0.15, color:'var(--blue)'},
+    {key:'participation',label:'课堂表现', baseWeight:0.15, color:'var(--purple)'},
+    {key:'homework',     label:'作业',     baseWeight:0.20, color:'var(--amber)'},
+    {key:'exam',         label:'考试',     baseWeight:0.50, color:'var(--pink)'}
   ];
   
   // Use latest semester with full data
@@ -237,6 +237,15 @@ function scoreBgClass(val,prev){
     const scores = latestSem.scores[sub.id];
     if(!scores || scores.gpa===null) return;
     
+    // Calculate redistributed weights for available dimensions
+    const availableDims = DIMS.filter(d => scores[d.key] !== null);
+    const totalBaseWeight = availableDims.reduce((sum, d) => sum + d.baseWeight, 0);
+    const dims = DIMS.map(d => ({
+      ...d,
+      effectiveWeight: scores[d.key] !== null ? d.baseWeight / totalBaseWeight : 0,
+      isAvailable: scores[d.key] !== null
+    }));
+    
     let cardHtml = `<div class="dim-card" style="border-left-color:${CATEGORIES[sub.category].color}">
       <div class="name">${sub.icon} ${sub.name} <span style="color:var(--muted);font-weight:400;font-size:.8rem">GPA ${scores.gpa}</span></div>`;
     
@@ -244,16 +253,17 @@ function scoreBgClass(val,prev){
     let maxLossDim = '';
     let maxLossVal = 0;
     
-    DIMS.forEach(dim=>{
-      const v = scores[dim.key];
-      if(v===null) {
-        cardHtml += `<div class="dim-row"><span class="dim-label">${dim.label}</span><span style="color:var(--muted)">—</span></div>`;
+    dims.forEach(dim=>{
+      if(!dim.isAvailable) {
+        cardHtml += `<div class="dim-row"><span class="dim-label">${dim.label}</span><span style="color:var(--muted);font-size:.75rem">未进行</span></div>`;
         return;
       }
-      const lost = (100 - v) * dim.weight;
+      const v = scores[dim.key];
+      const lost = (100 - v) * dim.effectiveWeight;
       const pct = v;
       const barColor = v >= 95 ? 'var(--green)' : v >= 85 ? dim.color : 'var(--red)';
       const lostColor = lost > 3 ? 'var(--red)' : lost > 1.5 ? 'var(--amber)' : 'var(--green)';
+      const weightPct = Math.round(dim.effectiveWeight * 100);
       
       if(lost > maxLoss){
         maxLoss = lost;
@@ -262,17 +272,22 @@ function scoreBgClass(val,prev){
       }
       
       cardHtml += `<div class="dim-row">
-        <span class="dim-label">${dim.label} ${Math.round(dim.weight*100)}%</span>
+        <span class="dim-label">${dim.label} ${weightPct}%</span>
         <div class="dim-bar-wrap"><div class="dim-bar" style="width:${pct}%;background:${barColor}"></div></div>
         <span class="dim-val">${v}</span>
         <span class="dim-lost" style="color:${lostColor}">-${lost.toFixed(1)}分</span>
       </div>`;
     });
     
-    // Opportunity insight
-    if(maxLoss > 0){
+    // Opportunity insight - show all significant loss areas (score < 90)
+    const weakDims = availableDims.filter(d => scores[d.key] !== null && scores[d.key] < 90)
+      .map(d => ({label: DIMS.find(dd=>dd.key===d.key).label, val: scores[d.key], lost: ((100-scores[d.key]) * (d.baseWeight/totalBaseWeight)).toFixed(1)}))
+      .sort((a,b) => a.val - b.val);
+    if(weakDims.length > 0){
+      const weakList = weakDims.map(w => `${w.label} ${w.val}分`).join('、');
       const potGpa = (scores.gpa + maxLoss).toFixed(1);
-      cardHtml += `<div class="opportunity">🎯 <strong>${maxLossDim}</strong>失分最多（${maxLossVal}分，扣${maxLoss.toFixed(1)}分），若提至满分GPA可达 <strong>${potGpa}</strong></div>`;
+      const weakLostSum = weakDims.reduce((s,w) => s + parseFloat(w.lost), 0).toFixed(1);
+      cardHtml += `<div class="opportunity">🎯 主要失分项: <strong>${weakList}</strong>，共扣${weakLostSum}分，若提至满分GPA可达 <strong>${potGpa}</strong></div>`;
     }
     
     cardHtml += '</div>';
@@ -290,11 +305,11 @@ function scoreBgClass(val,prev){
     {up:true, text:'化学持续走高：92.2→95.8，稳步攀升'},
     {up:true, text:'生物稳定提升：87.3→92.5，累计+5.2分'},
     {up:false, text:'EAL考试严重拖后腿：考试79.8分，占比50%扣10.1分，是全科最大失分项'},
-    {up:false, text:'社科课堂表现88+作业84.5偏低，但考试92.6强，说明考试能力已提升'},
+    {up:false, text:'社科课堂表现88+作业84.5是主要失分项，占比35%共扣4.2分，考试92.6已显著提升'},
     {up:false, text:'地理课堂表现仅82.5，占比15%扣2.6分，是地理最大失分项'},
     {up:false, text:'物理考试88分偏低，占比50%扣6分，从98.5下滑需重点关注'},
     {up:false, text:'生物考试87.5分，占比50%扣6.3分，是生物最大失分项'},
-    {up:false, text:'Art作业89.3是Art最低项，占比20%扣2.1分'}
+    {up:false, text:'Art课堂表现90+作业89.3是主要失分项，本学期无考试，占比35%共扣3.6分'}
   ];
   
   let html = '<h2>🔑 关键发现与提分建议</h2>';
