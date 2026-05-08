@@ -285,8 +285,8 @@ function scoreBgClass(val,prev){
       .sort((a,b) => a.val - b.val);
     if(weakDims.length > 0){
       const weakList = weakDims.map(w => `${w.label} ${w.val}分`).join('、');
-      const potGpa = (scores.gpa + maxLoss).toFixed(1);
-      const weakLostSum = weakDims.reduce((s,w) => s + parseFloat(w.lost), 0).toFixed(1);
+      const weakLostSum = weakDims.reduce((s,w) => s + parseFloat(w.lost), 0);
+      const potGpa = (scores.gpa + weakLostSum).toFixed(1);
       cardHtml += `<div class="opportunity">🎯 主要失分项: <strong>${weakList}</strong>，共扣${weakLostSum}分，若提至满分GPA可达 <strong>${potGpa}</strong></div>`;
     }
     
