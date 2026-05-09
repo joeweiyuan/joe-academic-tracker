@@ -21,6 +21,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .gpa-card .value{font-size:2.4rem;font-weight:800}
 .gpa-card .delta{font-size:.78rem;margin-top:4px}
 
+/* GPA Bar Chart */
+.gpa-bar-section{background:var(--card);border-radius:16px;padding:24px;margin-bottom:28px}
+.gpa-bar-section h2{font-size:1.15rem;margin-bottom:16px}
+.gpa-bar-chart{display:flex;align-items:flex-end;justify-content:center;gap:32px;height:240px;padding:0 20px}
+.gpa-bar-item{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;max-width:140px}
+.gpa-bar-item .bar-label{font-size:.82rem;color:var(--muted);white-space:nowrap}
+.gpa-bar-item .bar-value{font-size:1.3rem;font-weight:800}
+.gpa-bar-item .bar-delta{font-size:.72rem;font-weight:600}
+.gpa-bar-item .bar-wrap{width:100%;height:160px;display:flex;align-items:flex-end;justify-content:center}
+.gpa-bar-item .bar{width:72px;border-radius:10px 10px 0 0;transition:height .6s ease;position:relative;min-height:12px;box-shadow:0 0 20px rgba(255,255,255,.08)}
+.gpa-bar-item .bar .bar-inner-val{position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:.82rem;font-weight:700}
+
 .legend{display:flex;justify-content:center;gap:20px;margin:16px 0 28px;flex-wrap:wrap}
 .legend-item{display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--muted)}
 .legend-dot{width:12px;height:12px;border-radius:3px}
@@ -106,6 +118,8 @@ footer{text-align:center;padding:30px 0 16px;color:var(--muted);font-size:.75rem
 <div class="gpa-row" id="gpaCards"></div>
 <div class="legend" id="legend"></div>
 
+<div class="gpa-bar-section" id="gpaBarChart"></div>
+
 <div class="section">
   <h2>📋 各科成绩趋势总览</h2>
   <table id="mainTable"></table>
@@ -127,7 +141,7 @@ footer{text-align:center;padding:30px 0 16px;color:var(--muted);font-size:.75rem
 
 </div>
 
-<script src="data.js?v=20250508b"></script>
+<script src="data.js?v=20250509"></script>
 <script>
 // === GPA Cards ===
 (function(){
@@ -149,6 +163,45 @@ footer{text-align:center;padding:30px 0 16px;color:var(--muted);font-size:.75rem
   });
 })();
 
+// === GPA Bar Chart ===
+(function(){
+  const el = document.getElementById('gpaBarChart');
+  const barColors = [
+    {solid:'#3b82f6', gradient:'linear-gradient(to top, #2563eb, #60a5fa)'},
+    {solid:'#8b5cf6', gradient:'linear-gradient(to top, #7c3aed, #a78bfa)'},
+    {solid:'#ec4899', gradient:'linear-gradient(to top, #db2777, #f472b6)'}
+  ];
+  const labels = SEMESTERS.map(s=>s.label);
+  const gpas = SEMESTERS.map(s=>s.overall_gpa);
+  const minGpa = 3.2;  // 柱状图底座起始值，让差异更直观
+  
+  let html = '<h2>📊 每半学期GPA总分趋势</h2><div class="gpa-bar-chart">';
+  gpas.forEach((g,i)=>{
+    const barHeight = ((g - minGpa) / (4.0 - minGpa)) * 150;  // 映射到150px高度
+    const prev = i>0 ? gpas[i-1] : null;
+    const delta = prev!==null ? (g-prev) : null;
+    let deltaHtml = '';
+    if(delta!==null){
+      const cls = delta>=0?'chg-up':'chg-down';
+      const arrow = delta>=0?'↑':'↓';
+      const vsLabel = i===2 ? 'vs上学期期末' : `vs${labels[i-1]}`;
+      deltaHtml = `<div class="bar-delta ${cls}">${arrow}${delta>=0?'+':''}${delta.toFixed(2)} ${vsLabel}</div>`;
+    }
+    html += `<div class="gpa-bar-item">
+      <div class="bar-value" style="color:${barColors[i].solid}">${g.toFixed(2)}</div>
+      ${deltaHtml}
+      <div class="bar-wrap">
+        <div class="bar" style="height:${barHeight}px;background:${barColors[i].gradient}">
+          <div class="bar-inner-val" style="color:${barColors[i].solid}"></div>
+        </div>
+      </div>
+      <div class="bar-label">${labels[i]}</div>
+    </div>`;
+  });
+  html += '</div>';
+  el.innerHTML = html;
+})();
+
 // === Legend ===
 (function(){
   const el = document.getElementById('legend');
@@ -157,7 +210,8 @@ footer{text-align:center;padding:30px 0 16px;color:var(--muted);font-size:.75rem
   });
 })();
 
-function getGrade(gpa){ return gpa>=90?{label:'A',cls:'grade-a'}:gpa>=80?{label:'B',cls:'grade-b'}:{label:'C',cls:'grade-c'}; }
+function getGrade(gpa){ return gpa>=90?{label:'A',cls:'grade-a'}:gpa>=80?{label:'B',cls:'grade-b'}:gpa>=70?{label:'C',cls:'grade-c'}:{label:'D',cls:'grade-c'}; }
+// 等级标准: A≥90, B≥80, C≥70, D<70
 function scoreBgClass(val,prev){
   if(prev===null) return val>=90?'score-bg-gold':'score-bg-blue';
   const d=val-prev; return d>2?'score-bg-green':d<-2?'score-bg-red':'score-bg-blue';
@@ -173,7 +227,7 @@ function scoreBgClass(val,prev){
   ];
   let html = '<thead><tr><th class="left">科目</th>';
   SEMESTERS.forEach(s=> html += `<th>${s.shortLabel}</th>`);
-  html += '<th>趋势图</th><th>上学期学期GPA</th><th>整体变化</th><th>等级</th></tr></thead><tbody>';
+  html += '<th>趋势图</th><th>上学期综合GPA</th><th>整体变化</th><th>等级<span style="font-weight:400;font-size:.65rem;display:block;color:var(--muted)">A≥90 B≥80 C≥70</span></th></tr></thead><tbody>';
   
   SUBJECTS.forEach(sub=>{
     const vals = SEMESTERS.map(s=>s.scores[sub.id]?.gpa);
@@ -279,15 +333,43 @@ function scoreBgClass(val,prev){
       </div>`;
     });
     
-    // Opportunity insight - show all significant loss areas (score < 90)
-    const weakDims = availableDims.filter(d => scores[d.key] !== null && scores[d.key] < 90)
-      .map(d => ({label: DIMS.find(dd=>dd.key===d.key).label, val: scores[d.key], lost: ((100-scores[d.key]) * (d.baseWeight/totalBaseWeight)).toFixed(1)}))
-      .sort((a,b) => a.val - b.val);
-    if(weakDims.length > 0){
-      const weakList = weakDims.map(w => `${w.label} ${w.val}分`).join('、');
-      const weakLostSum = weakDims.reduce((s,w) => s + parseFloat(w.lost), 0);
-      const potGpa = (scores.gpa + weakLostSum).toFixed(1);
-      cardHtml += `<div class="opportunity">🎯 主要失分项: <strong>${weakList}</strong>，共扣${weakLostSum}分，若提至满分GPA可达 <strong>${potGpa}</strong></div>`;
+    // Opportunity insight - 日常维度(出勤+课堂表现+作业) vs 考试，分组对比
+    const dailyDims = availableDims.filter(d => d.key !== 'exam' && scores[d.key] !== null && scores[d.key] < 95);
+    const examDim = availableDims.filter(d => d.key === 'exam' && scores[d.key] !== null && scores[d.key] < 95);
+    const dailyLost = dailyDims.reduce((s,d) => s + (100-scores[d.key]) * (d.baseWeight/totalBaseWeight), 0);
+    const examLost = examDim.reduce((s,d) => s + (100-scores[d.key]) * (d.baseWeight/totalBaseWeight), 0);
+    const hasExam = availableDims.some(d => d.key === 'exam' && scores[d.key] !== null);
+    const totalLost = dailyLost + examLost;
+    
+    if(totalLost > 0.5){
+      let insight = '🎯 ';
+      if(hasExam && examLost > 0.5){
+        // 有考试且有考试失分：对比日常vs考试
+        if(dailyLost > examLost && dailyDims.length > 0){
+          const dailyList = dailyDims.map(d => {
+            const dimDef = DIMS.find(dd=>dd.key===d.key);
+            return `${dimDef.label}${scores[d.key]}分`;
+          }).join('+');
+          const dailyPct = Math.round(dailyLost/totalLost*100);
+          insight += `日常维度(${dailyList})合计扣${dailyLost.toFixed(1)}分(占${dailyPct}%) > 考试扣${examLost.toFixed(1)}分，<strong>课堂表现和作业是主要失分项</strong>`;
+        } else {
+          insight += `考试扣${examLost.toFixed(1)}分为最大失分项`;
+          if(dailyLost > 0.5){
+            insight += `，日常维度合计扣${dailyLost.toFixed(1)}分`;
+          }
+        }
+      } else {
+        // 无考试或考试已满分：只看日常维度
+        const weakList = dailyDims.map(d => {
+          const dimDef = DIMS.find(dd=>dd.key===d.key);
+          const wl = (100-scores[d.key]) * (d.baseWeight/totalBaseWeight);
+          return `${dimDef.label} ${scores[d.key]}分(扣${wl.toFixed(1)})`;
+        }).join('、');
+        insight += `主要失分项: <strong>${weakList}</strong>`;
+      }
+      const potGpa = (scores.gpa + totalLost).toFixed(1);
+      insight += `，若提至满分GPA可达 <strong>${potGpa}</strong>`;
+      cardHtml += `<div class="opportunity">${insight}</div>`;
     }
     
     cardHtml += '</div>';
@@ -305,7 +387,7 @@ function scoreBgClass(val,prev){
     {up:true, text:'化学持续走高：92.2→95.8，稳步攀升'},
     {up:true, text:'生物稳定提升：87.3→92.5，累计+5.2分'},
     {up:false, text:'EAL考试严重拖后腿：考试79.8分，占比50%扣10.1分，是全科最大失分项'},
-    {up:false, text:'社科课堂表现88+作业84.5是主要失分项，占比35%共扣4.2分，考试92.6已显著提升'},
+    {up:false, text:'社科课堂表现88+作业84.5是主要失分项（合计加权扣4.9分），考试92.6已显著提升'},
     {up:false, text:'地理课堂表现仅82.5，占比15%扣2.6分，是地理最大失分项'},
     {up:false, text:'物理考试88分偏低，占比50%扣6分，从98.5下滑需重点关注'},
     {up:false, text:'生物考试87.5分，占比50%扣6.3分，是生物最大失分项'},

@@ -16,7 +16,7 @@ const STUDENT = {
   school: "International School",
   grade: "9th Grade",
   target: "University Admission Academic Portfolio",
-  lastUpdated: "2025-05-08"
+  lastUpdated: "2025-05-09"
 };
 
 const SUBJECTS = [
@@ -169,7 +169,7 @@ const HIGHLIGHTS = {
     stars: [
       "🏆🏆 心理学99.0分，接近满分！出勤100+参与94+作业99.3+考试100，全科最均衡",
       "🚀 社科91.4分，vs上学期期末提升1.5分，vs上学期期中累计+12.1分",
-      "📈 整体GPA达到3.91，持续上升",
+      "📈 整体GPA达到3.91，vs上学期期末+0.14，持续上升",
       "🌟 地理95.5分，三阶段稳步攀升",
       "🧪 化学95.8分，持续走高",
       "📚 人文社科全面崛起，成为最大亮点"
