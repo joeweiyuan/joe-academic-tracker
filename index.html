@@ -78,7 +78,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .dim-row .dim-bar{height:100%;border-radius:4px;transition:width .5s}
 .dim-row .dim-val{width:40px;text-align:right;font-weight:600;flex-shrink:0}
 .dim-row .dim-lost{width:70px;text-align:right;flex-shrink:0;font-size:.75rem}
-.dim-row .dim-lost-label{width:70px;text-align:right;flex-shrink:0;font-size:.75rem;color:var(--muted)}
 .opportunity{margin-top:10px;padding:8px 12px;background:rgba(239,68,68,.08);border-radius:8px;font-size:.8rem;color:var(--amber);border:1px solid rgba(239,68,68,.15)}
 .opportunity strong{color:var(--red)}
 
@@ -141,61 +140,63 @@ footer{text-align:center;padding:30px 0 16px;color:var(--muted);font-size:.75rem
 
 </div>
 
-<script src="data.js?v=20250509"></script>
+<script src="data.js?v=20250621"></script>
 <script>
+// === Color palette (dynamic based on semester count) ===
+const SEMESTER_COLORS = [
+  {card:'var(--blue)',   bar:'#3b82f6', grad:'linear-gradient(to top, #2563eb, #60a5fa)', miniBg:'rgba(59,130,246,0.45)', miniBd:'rgba(59,130,246,0.85)'},
+  {card:'var(--purple)', bar:'#8b5cf6', grad:'linear-gradient(to top, #7c3aed, #a78bfa)', miniBg:'rgba(139,92,246,0.45)', miniBd:'rgba(139,92,246,0.85)'},
+  {card:'var(--pink)',   bar:'#ec4899', grad:'linear-gradient(to top, #db2777, #f472b6)', miniBg:'rgba(236,72,153,0.45)', miniBd:'rgba(236,72,153,0.85)'},
+  {card:'var(--green)',  bar:'#10b981', grad:'linear-gradient(to top, #059669, #34d399)', miniBg:'rgba(16,185,129,0.45)', miniBd:'rgba(16,185,129,0.85)'},
+  {card:'var(--amber)',  bar:'#f59e0b', grad:'linear-gradient(to top, #d97706, #fbbf24)', miniBg:'rgba(245,158,11,0.45)', miniBd:'rgba(245,158,11,0.85)'}
+];
+
+function getSemColor(i){
+  return SEMESTER_COLORS[i % SEMESTER_COLORS.length];
+}
+
 // === GPA Cards ===
 (function(){
   const el = document.getElementById('gpaCards');
-  const colors = ['var(--blue)','var(--purple)','var(--pink)'];
-  const labels = SEMESTERS.map(s=>s.label);
-  const gpas = SEMESTERS.map(s=>s.overall_gpa);
-  
-  gpas.forEach((g,i)=>{
-    const prev = i>0 ? gpas[i-1] : null;
-    const delta = prev!==null ? (g-prev) : null;
+  SEMESTERS.forEach((s,i)=>{
+    const c = getSemColor(i);
+    const prev = i>0 ? SEMESTERS[i-1].overall_gpa : null;
+    const delta = prev!==null ? (s.overall_gpa - prev) : null;
     let deltaHtml = '';
     if(delta!==null){
       const cls = delta>=0?'chg-up':'chg-down';
       const arrow = delta>=0?'↑':'↓';
-      deltaHtml = `<div class="delta ${cls}">${arrow} ${delta>=0?'+':''}${delta.toFixed(2)} vs ${labels[i-1]}</div>`;
+      deltaHtml = `<div class="delta ${cls}">${arrow} ${delta>=0?'+':''}${delta.toFixed(2)} vs ${SEMESTERS[i-1].label}</div>`;
     }
-    el.innerHTML += `<div class="gpa-card"><div class="label">${labels[i]}</div><div class="value" style="color:${colors[i]}">${g.toFixed(2)}</div>${deltaHtml}</div>`;
+    el.innerHTML += `<div class="gpa-card"><div class="label">${s.label}</div><div class="value" style="color:${c.card}">${s.overall_gpa.toFixed(2)}</div>${deltaHtml}</div>`;
   });
 })();
 
 // === GPA Bar Chart ===
 (function(){
   const el = document.getElementById('gpaBarChart');
-  const barColors = [
-    {solid:'#3b82f6', gradient:'linear-gradient(to top, #2563eb, #60a5fa)'},
-    {solid:'#8b5cf6', gradient:'linear-gradient(to top, #7c3aed, #a78bfa)'},
-    {solid:'#ec4899', gradient:'linear-gradient(to top, #db2777, #f472b6)'}
-  ];
-  const labels = SEMESTERS.map(s=>s.label);
-  const gpas = SEMESTERS.map(s=>s.overall_gpa);
-  const minGpa = 3.2;  // 柱状图底座起始值，让差异更直观
-  
+  const minGpa = 3.2;
   let html = '<h2>📊 每半学期GPA总分趋势</h2><div class="gpa-bar-chart">';
-  gpas.forEach((g,i)=>{
-    const barHeight = ((g - minGpa) / (4.0 - minGpa)) * 150;  // 映射到150px高度
-    const prev = i>0 ? gpas[i-1] : null;
-    const delta = prev!==null ? (g-prev) : null;
+  SEMESTERS.forEach((s,i)=>{
+    const c = getSemColor(i);
+    const barHeight = ((s.overall_gpa - minGpa) / (4.0 - minGpa)) * 150;
+    const prev = i>0 ? SEMESTERS[i-1].overall_gpa : null;
+    const delta = prev!==null ? (s.overall_gpa - prev) : null;
     let deltaHtml = '';
     if(delta!==null){
       const cls = delta>=0?'chg-up':'chg-down';
       const arrow = delta>=0?'↑':'↓';
-      const vsLabel = i===2 ? 'vs上学期期末' : `vs${labels[i-1]}`;
-      deltaHtml = `<div class="bar-delta ${cls}">${arrow}${delta>=0?'+':''}${delta.toFixed(2)} ${vsLabel}</div>`;
+      deltaHtml = `<div class="bar-delta ${cls}">${arrow}${delta>=0?'+':''}${delta.toFixed(2)} vs ${SEMESTERS[i-1].label}</div>`;
     }
     html += `<div class="gpa-bar-item">
-      <div class="bar-value" style="color:${barColors[i].solid}">${g.toFixed(2)}</div>
+      <div class="bar-value" style="color:${c.bar}">${s.overall_gpa.toFixed(2)}</div>
       ${deltaHtml}
       <div class="bar-wrap">
-        <div class="bar" style="height:${barHeight}px;background:${barColors[i].gradient}">
-          <div class="bar-inner-val" style="color:${barColors[i].solid}"></div>
+        <div class="bar" style="height:${barHeight}px;background:${c.grad}">
+          <div class="bar-inner-val" style="color:${c.bar}"></div>
         </div>
       </div>
-      <div class="bar-label">${labels[i]}</div>
+      <div class="bar-label">${s.label}</div>
     </div>`;
   });
   html += '</div>';
@@ -205,8 +206,9 @@ footer{text-align:center;padding:30px 0 16px;color:var(--muted);font-size:.75rem
 // === Legend ===
 (function(){
   const el = document.getElementById('legend');
-  [{color:'var(--blue)',label:'上学期期中'},{color:'var(--purple)',label:'上学期期末'},{color:'var(--pink)',label:'这学期期中'}].forEach(it=>{
-    el.innerHTML += `<div class="legend-item"><div class="legend-dot" style="background:${it.color}"></div>${it.label}</div>`;
+  SEMESTERS.forEach((s,i)=>{
+    const c = getSemColor(i);
+    el.innerHTML += `<div class="legend-item"><div class="legend-dot" style="background:${c.bar}"></div>${s.label}</div>`;
   });
 })();
 
@@ -220,14 +222,14 @@ function scoreBgClass(val,prev){
 // === Main Table ===
 (function(){
   const table = document.getElementById('mainTable');
-  const barColors = [
-    {bg:'rgba(59,130,246,0.45)',bd:'rgba(59,130,246,0.85)'},
-    {bg:'rgba(139,92,246,0.45)',bd:'rgba(139,92,246,0.85)'},
-    {bg:'rgba(236,72,153,0.45)',bd:'rgba(236,72,153,0.85)'}
-  ];
   let html = '<thead><tr><th class="left">科目</th>';
   SEMESTERS.forEach(s=> html += `<th>${s.shortLabel}</th>`);
-  html += '<th>趋势图</th><th>上学期综合GPA</th><th>整体变化</th><th>等级<span style="font-weight:400;font-size:.65rem;display:block;color:var(--muted)">A≥90 B≥80 C≥70</span></th></tr></thead><tbody>';
+  html += '<th>趋势图</th>';
+  // Show all semester composite averages
+  Object.keys(SEMESTER_COMPOSITE).forEach(k => {
+    html += `<th>${SEMESTER_COMPOSITE[k].label}GPA</th>`;
+  });
+  html += '<th>整体变化</th><th>等级<span style="font-weight:400;font-size:.65rem;display:block;color:var(--muted)">A≥90 B≥80 C≥70</span></th></tr></thead><tbody>';
   
   SUBJECTS.forEach(sub=>{
     const vals = SEMESTERS.map(s=>s.scores[sub.id]?.gpa);
@@ -236,7 +238,6 @@ function scoreBgClass(val,prev){
     const change = first!==null&&last!==null ? (last-first) : null;
     const isUp = change!==null && change>0;
     const isDown = change!==null && change<0;
-    const semGpa = SEMESTER_COMPOSITE.sem1.scores[sub.id];
     const grade = getGrade(last||0);
     
     html += `<tr><td class="left">${sub.icon} ${sub.name}</td>`;
@@ -256,13 +257,19 @@ function scoreBgClass(val,prev){
     
     html += '<td><div class="mini-bars">';
     vals.forEach((v,i)=>{
-      if(v===null){ html+=`<div class="mini-bar" style="height:3px;background:${barColors[i].bg};border:1px solid ${barColors[i].bd};opacity:.3"></div>`; return; }
+      const c = getSemColor(i);
+      if(v===null){ html+=`<div class="mini-bar" style="height:3px;background:${c.miniBg};border:1px solid ${c.miniBd};opacity:.3"></div>`; return; }
       const h = Math.max(4,((v-50)/50)*28);
-      html += `<div class="mini-bar" style="height:${h}px;background:${barColors[i].bg};border:1.5px solid ${barColors[i].bd}"></div>`;
+      html += `<div class="mini-bar" style="height:${h}px;background:${c.miniBg};border:1.5px solid ${c.miniBd}"></div>`;
     });
     html += '</div></td>';
     
-    html += `<td style="font-weight:600">${semGpa||'—'}</td>`;
+    // Show composite GPAs
+    Object.keys(SEMESTER_COMPOSITE).forEach(k => {
+      const compVal = SEMESTER_COMPOSITE[k].scores[sub.id];
+      html += `<td style="font-weight:600">${compVal||'—'}</td>`;
+    });
+    
     if(change!==null){
       const cls = isUp?'change-up':'change-down';
       const arrow = isUp?'▲':'▼';
@@ -301,7 +308,7 @@ function scoreBgClass(val,prev){
     }));
     
     let cardHtml = `<div class="dim-card" style="border-left-color:${CATEGORIES[sub.category].color}">
-      <div class="name">${sub.icon} ${sub.name} <span style="color:var(--muted);font-weight:400;font-size:.8rem">GPA ${scores.gpa}</span></div>`;
+      <div class="name">${sub.icon} ${sub.name} <span style="color:var(--muted);font-weight:400;font-size:.8rem">GPA ${scores.gpa} (${latestSem.label})</span></div>`;
     
     let maxLoss = 0;
     let maxLossDim = '';
@@ -333,7 +340,7 @@ function scoreBgClass(val,prev){
       </div>`;
     });
     
-    // Opportunity insight - 日常维度(出勤+课堂表现+作业) vs 考试，分组对比
+    // Opportunity insight
     const dailyDims = availableDims.filter(d => d.key !== 'exam' && scores[d.key] !== null && scores[d.key] < 95);
     const examDim = availableDims.filter(d => d.key === 'exam' && scores[d.key] !== null && scores[d.key] < 95);
     const dailyLost = dailyDims.reduce((s,d) => s + (100-scores[d.key]) * (d.baseWeight/totalBaseWeight), 0);
@@ -344,7 +351,6 @@ function scoreBgClass(val,prev){
     if(totalLost > 0.5){
       let insight = '🎯 ';
       if(hasExam && examLost > 0.5){
-        // 有考试且有考试失分：对比日常vs考试
         if(dailyLost > examLost && dailyDims.length > 0){
           const dailyList = dailyDims.map(d => {
             const dimDef = DIMS.find(dd=>dd.key===d.key);
@@ -359,7 +365,6 @@ function scoreBgClass(val,prev){
           }
         }
       } else {
-        // 无考试或考试已满分：只看日常维度
         const weakList = dailyDims.map(d => {
           const dimDef = DIMS.find(dd=>dd.key===d.key);
           const wl = (100-scores[d.key]) * (d.baseWeight/totalBaseWeight);
@@ -380,19 +385,54 @@ function scoreBgClass(val,prev){
 // === Key Findings ===
 (function(){
   const el = document.getElementById('findings');
-  const items = [
-    {up:true, text:'心理学99分近乎满分：出勤100+参与94+作业99.3+考试100，无短板'},
-    {up:true, text:'社科大幅进步：79.3→91.4，累计+12.1分，进步幅度全科目最大'},
-    {up:true, text:'地理稳步上升：88.6→95.5，每个阶段都在进步'},
-    {up:true, text:'化学持续走高：92.2→95.8，稳步攀升'},
-    {up:true, text:'生物稳定提升：87.3→92.5，累计+5.2分'},
-    {up:false, text:'EAL考试严重拖后腿：考试79.8分，占比50%扣10.1分，是全科最大失分项'},
-    {up:false, text:'社科课堂表现88+作业84.5是主要失分项（合计加权扣4.9分），考试92.6已显著提升'},
-    {up:false, text:'地理课堂表现仅82.5，占比15%扣2.6分，是地理最大失分项'},
-    {up:false, text:'物理考试88分偏低，占比50%扣6分，从98.5下滑需重点关注'},
-    {up:false, text:'生物考试87.5分，占比50%扣6.3分，是生物最大失分项'},
-    {up:false, text:'Art课堂表现90+作业89.3是主要失分项，本学期无考试，占比35%共扣3.6分'}
+  // Auto-generate key findings based on all semester data
+  let items = [];
+  
+  // Find biggest improvements and declines
+  SUBJECTS.forEach(sub=>{
+    const vals = SEMESTERS.map(s=>s.scores[sub.id]?.gpa).filter(v=>v!==null);
+    if(vals.length >= 2){
+      const first = vals[0];
+      const last = vals[vals.length-1];
+      const change = last - first;
+      if(change >= 4){
+        items.push({up:true, text:`${sub.name}大幅进步：${first}→${last}，累计+${change.toFixed(1)}分`});
+      } else if(change <= -3){
+        items.push({up:false, text:`${sub.name}下滑：${first}→${last}，累计${change.toFixed(1)}分`});
+      }
+    }
+  });
+  
+  // Find largest dimension losses in latest semester
+  const DIMS2 = [
+    {key:'attendance',   label:'出勤',     baseWeight:0.15},
+    {key:'participation',label:'课堂表现', baseWeight:0.15},
+    {key:'homework',     label:'作业',     baseWeight:0.20},
+    {key:'exam',         label:'考试',     baseWeight:0.50}
   ];
+  const latestSem = SEMESTERS[SEMESTERS.length-1];
+  let allLosses = [];
+  SUBJECTS.forEach(sub=>{
+    const scores = latestSem.scores[sub.id];
+    if(!scores) return;
+    const availDims = DIMS2.filter(d => scores[d.key] !== null);
+    const totalW = availDims.reduce((s,d)=>s+d.baseWeight,0);
+    availDims.forEach(d=>{
+      const v = scores[d.key];
+      if(v < 85){
+        allLosses.push({sub:sub.name, dim:d.label, val:v, loss:(100-v)*(d.baseWeight/totalW)});
+      }
+    });
+  });
+  allLosses.sort((a,b)=>b.loss-a.loss);
+  allLosses.slice(0,5).forEach(l=>{
+    items.push({up:false, text:`${l.sub}的${l.dim}${l.val}分是主要失分项（扣${l.loss.toFixed(1)}分）`});
+  });
+  
+  // Add summary items
+  const firstGpa = SEMESTERS[0].overall_gpa;
+  const lastGpa = SEMESTERS[SEMESTERS.length-1].overall_gpa;
+  items.unshift({up:lastGpa>=firstGpa, text:`整体GPA从${firstGpa.toFixed(2)}提升到${lastGpa.toFixed(2)}，${lastGpa>=firstGpa?'累计提升+'+(lastGpa-firstGpa).toFixed(2):'回落'+(firstGpa-lastGpa).toFixed(2)}`});
   
   let html = '<h2>🔑 关键发现与提分建议</h2>';
   items.forEach(it=>{
@@ -406,8 +446,10 @@ function scoreBgClass(val,prev){
 // === Highlights Cards ===
 (function(){
   const el = document.getElementById('hlCards');
-  const semLabels = {sem1_mid:'上学期期中',sem1_final:'上学期期末',sem2_mid:'下学期期中'};
+  const semLabels = {};
+  SEMESTERS.forEach(s => { semLabels[s.id] = s.label; });
   Object.entries(HIGHLIGHTS).forEach(([key,hl])=>{
+    if(!hl.stars && !hl.warnings && !hl.suggestions) return;
     let card = `<div class="hl-card"><h3>📌 ${semLabels[key]||key}</h3>`;
     if(hl.stars) hl.stars.forEach(s=> card += `<div class="item hl-star">${s}</div>`);
     if(hl.warnings) hl.warnings.forEach(w=> card += `<div class="item hl-warn">${w}</div>`);
