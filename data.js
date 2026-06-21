@@ -13,10 +13,10 @@ const STUDENT = {
   name_en: "Joe Wei",
   name_cn: "魏源",
   class: "Pre-2",
-  school: "International School",
+  school: "宏文学校 / 光华美高",
   grade: "9th Grade",
   target: "University Admission Academic Portfolio",
-  lastUpdated: "2025-05-09"
+  lastUpdated: "2026-06-21"
 };
 
 const SUBJECTS = [
@@ -105,6 +105,28 @@ const SEMESTERS = [
       art:        { gpa: 91.2,  attendance: 100, participation: 90,   homework: 89.3,  exam: null },
       pe:         { gpa: 97,   attendance: 100, participation: 95,   homework: null,  exam: null }
     }
+  },
+  {
+    id: "sem2_final",
+    label: "下学期期末",
+    shortLabel: "期末②",
+    term: "final",
+    year: "2024-2025",
+    semester: 2,
+    overall_gpa: 3.91,
+    date: "2025年6月",
+    scores: {
+      eal:        { gpa: 88.1,  attendance: 100, participation: 98,   homework: 93.2,  exam: 79.6 },
+      social:     { gpa: 91.3,  attendance: 97.9, participation: 93,   homework: 82.1,  exam: 92.4 },
+      geography:  { gpa: 92.3,  attendance: 100, participation: 95,   homework: 100,   exam: 86 },
+      psychology: { gpa: 95.6,  attendance: 100, participation: 95,   homework: 91.5,  exam: 96 },
+      algebra2:   { gpa: 97.0,  attendance: 100, participation: 94,   homework: 99.3,  exam: 96 },
+      physics:    { gpa: 94.9,  attendance: 100, participation: 99,   homework: 100,   exam: 90 },
+      chemistry:  { gpa: 91.2,  attendance: 100, participation: 97,   homework: 98,    exam: 84 },
+      biology:    { gpa: 93.8,  attendance: 100, participation: 90,   homework: 100,   exam: 90.5 },
+      art:        { gpa: 93.6,  attendance: 100, participation: 91,   homework: 93.5,  exam: 98.1 },
+      pe:         { gpa: 98.9,  attendance: 100, participation: 100,  homework: null,  exam: null }
+    }
   }
 ];
 
@@ -125,6 +147,22 @@ const SEMESTER_COMPOSITE = {
       pe:         +(0.4*96.1  + 0.6*88.0).toFixed(1)
     },
     overall_gpa: 3.77
+  },
+  sem2: {
+    label: "下学期综合",
+    scores: {
+      eal:        +(0.4*88.8  + 0.6*88.1).toFixed(1),
+      social:     +(0.4*91.4  + 0.6*91.3).toFixed(1),
+      geography:  +(0.4*95.5  + 0.6*92.3).toFixed(1),
+      psychology: +(0.4*99.0  + 0.6*95.6).toFixed(1),
+      algebra2:   +(0.4*92.9  + 0.6*97.0).toFixed(1),
+      physics:    +(0.4*93.4  + 0.6*94.9).toFixed(1),
+      chemistry:  +(0.4*95.8  + 0.6*91.2).toFixed(1),
+      biology:    +(0.4*92.5  + 0.6*93.8).toFixed(1),
+      art:        +(0.4*91.2  + 0.6*93.6).toFixed(1),
+      pe:         +(0.4*97.0  + 0.6*98.9).toFixed(1)
+    },
+    overall_gpa: 3.91
   }
 };
 
@@ -185,6 +223,29 @@ const HIGHLIGHTS = {
       "🟡 代数2需巩固，避免继续下滑",
       "🟢 心理学保持现有学习方法，社科需提升课堂表现和作业质量",
       "🔵 EAL需重点突破考试技巧，课堂表现已非常优秀"
+    ]
+  },
+  sem2_final: {
+    stars: [
+      "🚀🚀 代数2强势反弹！92.9→97.0（+4.1），期末考试96分，理科根基稳固",
+      "🏆 PE 98.9分创历史新高！出勤100+参与100，完美收官",
+      "📈 Art触底反弹：91.2→93.6（+2.4），期末考试98.1分惊艳全场",
+      "⚛️ 物理止跌回升：93.4→94.9（+1.5），终于逆转三连跌",
+      "🧬 生物稳步上升：92.5→93.8（+1.3），新科目适应良好",
+      "📊 整体GPA稳居3.91，整学年保持高水准"
+    ],
+    warnings: [
+      "⚠️ 化学大幅回落：95.8→91.2（-4.6），期末考试84分，下半学期状态明显下滑",
+      "⚠️ 地理下滑：95.5→92.3（-3.2），期末考试86分，需关注",
+      "⚠️ 心理学回落：99.0→95.6（-3.4），虽仍属高分但降幅不小",
+      "⚠️ EAL Exam持续低迷：79.8→79.6，考试能力仍是最大短板"
+    ],
+    suggestions: [
+      "🔴 紧急：化学期末84分值得警惕，暑期需预习或补习",
+      "🔴 EAL考试能力依然是全局最大短板，暑期托福集训重点突破",
+      "🟡 地理和心理需在暑假调整学习方法",
+      "🟢 Algebra 2和物理的反转证明Joe有能力改善弱势科目",
+      "🌟 跨入光华美高前的最后一份成绩单，以GPA 3.91完美收官宏文时光"
     ]
   }
 };
