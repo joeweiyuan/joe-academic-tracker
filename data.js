@@ -13,7 +13,7 @@ const STUDENT = {
   name_en: "Joe Wei",
   name_cn: "魏源",
   class: "Pre-2",
-  school: "宏文学校 / 光华美高",
+  school: "宏文学校 / 光华剑桥",
   grade: "9th Grade",
   target: "University Admission Academic Portfolio",
   lastUpdated: "2026-06-21"
@@ -245,7 +245,7 @@ const HIGHLIGHTS = {
       "🔴 EAL考试能力依然是全局最大短板，暑期托福集训重点突破",
       "🟡 地理和心理需在暑假调整学习方法",
       "🟢 Algebra 2和物理的反转证明Joe有能力改善弱势科目",
-      "🌟 跨入光华美高前的最后一份成绩单，以GPA 3.91完美收官宏文时光"
+      "🌟 跨入光华剑桥前的最后一份成绩单，以GPA 3.91完美收官宏文时光"
     ]
   }
 };
