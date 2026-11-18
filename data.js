@@ -12,11 +12,11 @@
 const STUDENT = {
   name_en: "Joe Wei",
   name_cn: "魏源",
-  class: "Pre-2",
-  school: "宏文学校 / 光华剑桥",
-  grade: "9th Grade",
+  class: "10年级 2班",
+  school: "光剑美高（Guanghua Cambridge）",
+  grade: "10th Grade",
   target: "University Admission Academic Portfolio",
-  lastUpdated: "2026-06-21"
+  lastUpdated: "2026-11-16"
 };
 
 const SUBJECTS = [
@@ -29,7 +29,15 @@ const SUBJECTS = [
   { id: "chemistry",     name: "Intro to Chemistry",      category: "science",     icon: "🧪" },
   { id: "biology",       name: "Intro to Biology",        category: "science",     icon: "🧬" },
   { id: "art",           name: "Art",                     category: "elective",    icon: "🎨" },
-  { id: "pe",            name: "PE",                      category: "elective",    icon: "⚽" }
+  { id: "pe",            name: "PE",                      category: "elective",    icon: "⚽" },
+  /* ===== 2026-2027 光剑美高 10 年级 ===== */
+  { id: "apcalc",        name: "AP Calculus AB",          category: "science",     icon: "∫" },
+  { id: "apmicro",       name: "AP Microeconomics",       category: "humanities",  icon: "💹" },
+  { id: "pachem",        name: "Pre-AP Chemistry",        category: "science",     icon: "🧪" },
+  { id: "pabio",         name: "Pre-AP Biology",          category: "science",     icon: "🧬" },
+  { id: "paenglish",     name: "Pre-AP English 1",        category: "language",    icon: "📖" },
+  { id: "worldhistory",  name: "World History",           category: "humanities",  icon: "🏛️" },
+  { id: "spanish",       name: "Spanish",                 category: "language",    icon: "🇪🇸" }
 ];
 
 const CATEGORIES = {
@@ -126,6 +134,32 @@ const SEMESTERS = [
       biology:    { gpa: 93.8,  attendance: 100, participation: 90,   homework: 100,   exam: 90.5 },
       art:        { gpa: 93.6,  attendance: 100, participation: 91,   homework: 93.5,  exam: 98.1 },
       pe:         { gpa: 98.9,  attendance: 100, participation: 100,  homework: null,  exam: null }
+    }
+  },
+  /* ===== 光剑美高 10 年级 · 2026-2027 第一学期期中 ===== */
+  {
+    id: "sem_2026s1_mid",
+    label: "十年级上学期期中",
+    shortLabel: "十上·期中",
+    term: "mid",
+    year: "2026-2027",
+    semester: 1,
+    school: "光剑美高",
+    overall_gpa: 3.20,
+    overall_pct: 88.19,
+    gpa_note: "10 科 GPA 列未加权平均 88.19；4.0 分级换算 3.20（线性换算 3.53）。学校官方加权 GPA 另计。",
+    date: "2026年11月",
+    scores: {
+      apcalc:       { gpa: 73.1, attendance: 100, participation: 95,   homework: 91.7, exam: 51.0 },
+      apmicro:      { gpa: 85.6, attendance: 98,  participation: 90,   homework: 91.8, exam: 78.0 },
+      pachem:       { gpa: 89.5, attendance: 100, participation: 98.5, homework: 73.4, exam: 90.0 },
+      pabio:        { gpa: 89.7, attendance: 100, participation: 92.5, homework: 96.8, exam: 83.0 },
+      paenglish:    { gpa: 88.7, attendance: 100, participation: 90,   homework: 95.9, exam: 82.0 },
+      worldhistory: { gpa: 84.2, attendance: 100, participation: 96.5, homework: 91.3, exam: 73.0 },
+      pe:           { gpa: 100.0, attendance: 100, participation: 100, homework: null, exam: null },
+      psychology:   { gpa: 90.5, attendance: 100, participation: 91.5, homework: 96.3, exam: 85.0 },
+      art:          { gpa: 95.3, attendance: 100, participation: 94,   homework: 94.7, exam: null },
+      spanish:      { gpa: 85.3, attendance: 100, participation: 99.2, homework: 88.8, exam: 75.4 }
     }
   }
 ];
@@ -246,6 +280,26 @@ const HIGHLIGHTS = {
       "🟡 地理和心理需在暑假调整学习方法",
       "🟢 Algebra 2和物理的反转证明Joe有能力改善弱势科目",
       "🌟 跨入光华剑桥前的最后一份成绩单，以GPA 3.91完美收官宏文时光"
+    ]
+  },
+  sem_2026s1_mid: {
+    stars: [
+      "🎓 转入光剑美高 10 年级后的第一份成绩单：10 科平均 88.19 分，与旧校 3.91 的节奏基本衔接",
+      "🏆 体育 100 分、艺术 95.3 分、心理学 90.5 分，非考试类与社科类表现稳定",
+      "📈 全科出勤 100%（AP 微观经济 98%），学习态度无可挑剔",
+      "🧪 Pre-AP 化学考试 90 分，是全场最高的考试分"
+    ],
+    warnings: [
+      "🔴 AP 微积分 AB：GPA 73.1 / 考试 51 分，是唯一低于 80 的科目（全靠平时分撑住）",
+      "⚠️ 考试分普遍低于 GPA 10–15 分，说明现在靠出勤与作业托分，期末加权后会掉",
+      "⚠️ 世界史 73 / 西班牙语 75.4 / AP 微观经济 78，三门考试均在 80 以下",
+      "⚠️ 化学作业 73.4，但考试 90 — 会做题但不爱交作业，白丢平时分"
+    ],
+    suggestions: [
+      "🔴 最高优先：AP 微积分 AB 用 Unit1–5 诊断卷定位断层，每周 2×45min 补基础",
+      "🟡 AP 课（微积分/微观经济）考试分是 GPA 的主要风险点，优先抓",
+      "🟢 化学：把作业按时交齐，73.4→85+ 是成本最低的提分点",
+      "📌 注意口径：本页 GPA 3.20 为「成绩单 GPA 列未加权平均 + 分级换算」，非学校官方加权 GPA"
     ]
   }
 };
