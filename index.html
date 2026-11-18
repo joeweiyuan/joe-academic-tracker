@@ -154,7 +154,7 @@ footer{text-align:center;padding:30px 0 16px;color:var(--muted);font-size:.75rem
 
 </div>
 
-<script src="data.js?v=20261118"></script>
+<script src="data.js?v=20261118b"></script>
 <script>
 // === Color palette (dynamic based on semester count) ===
 const SEMESTER_COLORS = [
@@ -182,7 +182,9 @@ function getSemColor(i){
       const arrow = delta>=0?'↑':'↓';
       deltaHtml = `<div class="delta ${cls}">${arrow} ${delta>=0?'+':''}${delta.toFixed(2)} vs ${SEMESTERS[i-1].label}</div>`;
     }
-    el.innerHTML += `<div class="gpa-card"><div class="label">${s.label}</div><div class="value" style="color:${c.card}">${s.overall_gpa.toFixed(2)}</div>${deltaHtml}</div>`;
+    const maxHtml = (typeof s.max_gpa === 'number')
+      ? `<span style="font-size:.95rem;font-weight:600;color:var(--muted)">（满分 ${s.max_gpa.toFixed(2)}）</span>` : '';
+    el.innerHTML += `<div class="gpa-card"><div class="label">${s.label}</div><div class="value" style="color:${c.card}">${s.overall_gpa.toFixed(2)}${maxHtml}</div>${deltaHtml}</div>`;
   });
 })();
 
@@ -485,8 +487,8 @@ function scoreBgClass(val,prev){
     <div class="sc-row">
       <div class="sc-card">
         <div class="k">学校官方阶段 GPA（AP 加权）</div>
-        <div class="v" style="color:var(--amber)">${s.overall_gpa.toFixed(2)}</div>
-        <div class="n">满绩：AP 5.0 ｜ Pre-AP 4.5 ｜ 非 AP 4.0<br>按 ${credits} 学分加权</div>
+        <div class="v" style="color:var(--amber)">${s.overall_gpa.toFixed(2)}<span style="font-size:.85rem;font-weight:600;color:var(--muted)">（满分 ${s.max_gpa.toFixed(2)}）</span></div>
+        <div class="n">满绩：AP 5.0 ｜ Pre-AP 4.5 ｜ 非 AP 4.0<br>按 ${credits} 学分加权 → 满绩 ${s.max_gpa.toFixed(2)}<br>实得 = 满绩的 ${(s.overall_gpa/s.max_gpa*100).toFixed(1)}%</div>
       </div>
       <div class="sc-card">
         <div class="k">折合 4.0 制（学分加权）</div>
