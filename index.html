@@ -21,6 +21,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .gpa-card .value{font-size:2.4rem;font-weight:800}
 .gpa-card .delta{font-size:.78rem;margin-top:4px}
 
+/* GPA 口径对照 */
+.scale-compare{background:linear-gradient(135deg,rgba(59,130,246,.12),rgba(139,92,246,.12));border:1px solid var(--card2);border-radius:16px;padding:20px 24px;margin:0 0 24px}
+.scale-compare h2{font-size:1rem;margin-bottom:14px}
+.sc-row{display:flex;gap:14px;flex-wrap:wrap}
+.sc-card{flex:1;min-width:168px;background:rgba(15,23,42,.55);border:1px solid var(--card2);border-radius:12px;padding:14px 18px}
+.sc-card .k{font-size:.78rem;color:var(--muted);margin-bottom:4px}
+.sc-card .v{font-size:1.95rem;font-weight:800;line-height:1.15}
+.sc-card .n{font-size:.72rem;color:var(--muted);margin-top:6px;line-height:1.5}
+.sc-note{font-size:.76rem;color:var(--muted);margin-top:14px;line-height:1.65;border-top:1px solid var(--card2);padding-top:12px}
+.sc-note b{color:#e2e8f0}
+
 /* GPA Bar Chart */
 .gpa-bar-section{background:var(--card);border-radius:16px;padding:24px;margin-bottom:28px}
 .gpa-bar-section h2{font-size:1.15rem;margin-bottom:16px}
@@ -115,6 +126,9 @@ footer{text-align:center;padding:30px 0 16px;color:var(--muted);font-size:.75rem
 </div>
 
 <div class="gpa-row" id="gpaCards"></div>
+
+<div class="scale-compare" id="scaleCompare"></div>
+
 <div class="legend" id="legend"></div>
 
 <div class="gpa-bar-section" id="gpaBarChart"></div>
@@ -140,7 +154,7 @@ footer{text-align:center;padding:30px 0 16px;color:var(--muted);font-size:.75rem
 
 </div>
 
-<script src="data.js?v=20250621"></script>
+<script src="data.js?v=20261118"></script>
 <script>
 // === Color palette (dynamic based on semester count) ===
 const SEMESTER_COLORS = [
@@ -457,6 +471,36 @@ function scoreBgClass(val,prev){
     card += '</div>';
     el.innerHTML += card;
   });
+})();
+// === GPA 口径对照（官方加权 vs 折合 4.0）===
+(function(){
+  const el = document.getElementById('scaleCompare');
+  if(!el) return;
+  const s = SEMESTERS.filter(x => x.official && typeof x.unweighted_gpa4 === 'number').pop();
+  if(!s) return;
+  const gap = (s.overall_gpa - s.unweighted_gpa4).toFixed(2);
+  const credits = s.scores ? Object.values(s.scores).reduce((a,b)=>a+(b.credit||0),0) : 8.75;
+  el.innerHTML = `
+    <h2>📐 GPA 口径对照 <span style="font-size:.76rem;color:var(--muted);font-weight:400">同一份成绩 · 两种算法</span></h2>
+    <div class="sc-row">
+      <div class="sc-card">
+        <div class="k">学校官方阶段 GPA（AP 加权）</div>
+        <div class="v" style="color:var(--amber)">${s.overall_gpa.toFixed(2)}</div>
+        <div class="n">满绩：AP 5.0 ｜ Pre-AP 4.5 ｜ 非 AP 4.0<br>按 ${credits} 学分加权</div>
+      </div>
+      <div class="sc-card">
+        <div class="k">折合 4.0 制（学分加权）</div>
+        <div class="v" style="color:var(--blue)">${s.unweighted_gpa4.toFixed(2)}</div>
+        <div class="n">每科按「÷ 满绩 × 4」折算<br>美国大学自行重算时最接近这个值</div>
+      </div>
+      <div class="sc-card">
+        <div class="k">核心 8 科（去艺术/体育）</div>
+        <div class="v" style="color:var(--green)">${s.core_unweighted.toFixed(2)}</div>
+        <div class="n">只算学术核心课<br>最能反映真实学术水位</div>
+      </div>
+    </div>
+    <div class="sc-note">📌 <b>为什么差 ${gap}</b>：官方 ${s.overall_gpa.toFixed(2)} 含 AP / Pre-AP 的加权红利（AP 满绩 5.0、Pre-AP 满绩 4.5）；<b>折合 4.0 制后为 ${s.unweighted_gpa4.toFixed(2)}</b>，核心课 ${s.core_unweighted.toFixed(2)}。申请材料里两个口径都要能解释——只报 ${s.overall_gpa.toFixed(2)} 而不说明，遇到自行重算的学校会对不上。</div>
+  `;
 })();
 </script>
 </body>
