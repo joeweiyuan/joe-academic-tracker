@@ -129,6 +129,8 @@ footer{text-align:center;padding:30px 0 16px;color:var(--muted);font-size:.75rem
 
 <div class="scale-compare" id="scaleCompare"></div>
 
+<div class="section" id="targetPlan"></div>
+
 <div class="legend" id="legend"></div>
 
 <div class="gpa-bar-section" id="gpaBarChart"></div>
@@ -154,7 +156,7 @@ footer{text-align:center;padding:30px 0 16px;color:var(--muted);font-size:.75rem
 
 </div>
 
-<script src="data.js?v=20261118b"></script>
+<script src="data.js?v=20261118d"></script>
 <script>
 // === Color palette (dynamic based on semester count) ===
 const SEMESTER_COLORS = [
@@ -502,6 +504,59 @@ function scoreBgClass(val,prev){
       </div>
     </div>
     <div class="sc-note">📌 <b>为什么差 ${gap}</b>：官方 ${s.overall_gpa.toFixed(2)} 含 AP / Pre-AP 的加权红利（AP 满绩 5.0、Pre-AP 满绩 4.5）；<b>折合 4.0 制后为 ${s.unweighted_gpa4.toFixed(2)}</b>，核心课 ${s.core_unweighted.toFixed(2)}。申请材料里两个口径都要能解释——只报 ${s.overall_gpa.toFixed(2)} 而不说明，遇到自行重算的学校会对不上。</div>
+  `;
+})();
+
+// === 期末目标测算（2026-11-18 · 基于 2026-11-16 官方成绩单）===
+(function(){
+  const el = document.getElementById('targetPlan');
+  if(!el) return;
+  const s = SEMESTERS.filter(x => x.official && typeof x.max_gpa === 'number').pop();
+  if(!s) return;
+  const cur = Object.values(s.scores).reduce((a,b)=>a + (b.gpa4||0)*(b.credit||0), 0);
+  const cr  = Object.values(s.scores).reduce((a,b)=>a + (b.credit||0), 0);
+  const T = 3.90, need = T*cr, gap = need-cur;
+  const tiers = [3.80, 3.90, 4.00, s.max_gpa];
+  const paths = [
+    { name:"路径 A · 主攻 AP 微积分", note:"最大单点杠杆：AP 课 1 个绩点 = 1 个学分点",
+      moves:[["AP 微积分 AB",3.00,4.00],["世界史",3.08,3.33],["西班牙语",3.16,3.41]], result:3.90 },
+    { name:"路径 B · 全科均匀小步", note:"除艺术/体育外每门 +0.19，不押注单科",
+      moves:[["8 门核心课","各 +0.19"]], result:3.91 },
+    { name:"路径 C · 只补最弱三科", note:"AP 微积分 +1.00、世界史 +0.30、西语 +0.20",
+      moves:[["AP 微积分 AB",3.00,4.00],["世界史",3.08,3.38],["西班牙语",3.16,3.36]], result:3.90 }
+  ];
+  const tierRows = tiers.map(t=>{
+    const n = t*cr, g = n-cur;
+    const each = g/(Object.keys(s.scores).length - 2);
+    return `<tr><td style="font-weight:700">${t.toFixed(2)}</td><td>${n.toFixed(3)}</td>
+      <td style="color:${g<=0?'var(--green)':'var(--amber)'};font-weight:700">${g>0?'+':''}${g.toFixed(3)}</td>
+      <td>${g<=0?'已达成':'8 门各 +'+(g/8).toFixed(3)}</td></tr>`;
+  }).join('');
+  const pathCards = paths.map(p=>{
+    const mv = p.moves.map(m => m.length===3
+      ? `<li>${m[0]}：<b>${m[1].toFixed(2)} → ${m[2].toFixed(2)}</b> <span style="color:var(--green)">(+${(m[2]-m[1]).toFixed(2)})</span></li>`
+      : `<li>${m[0]}：<b>${m[1]}</b></li>`).join('');
+    return `<div class="sc-card" style="min-width:230px">
+      <div class="k" style="font-weight:700;color:#e2e8f0">${p.name}</div>
+      <div class="v" style="color:var(--green);font-size:1.5rem">${p.result.toFixed(2)}</div>
+      <div class="n">${p.note}</div>
+      <ul style="margin:8px 0 0;padding-left:16px;font-size:.76rem;color:var(--muted);line-height:1.7">${mv}</ul>
+    </div>`;
+  }).join('');
+  el.innerHTML = `
+    <h2>🎯 期末目标测算 <span style="font-size:.78rem;color:var(--muted);font-weight:400">目标 3.90 ｜ 满绩 ${s.max_gpa.toFixed(2)} ｜ 基于 ${s.date} 官方成绩单</span></h2>
+    <div class="sc-row" style="margin-bottom:18px">
+      <div class="sc-card"><div class="k">当前 GPA</div><div class="v" style="color:var(--amber)">${s.overall_gpa.toFixed(2)}</div><div class="n">Σ(绩点×学分) = ${cur.toFixed(3)}<br>总学分 ${cr}</div></div>
+      <div class="sc-card"><div class="k">目标 3.90 需要</div><div class="v" style="color:var(--blue)">${need.toFixed(3)}</div><div class="n">3.90 × ${cr} 学分<br>= 满绩的 88.6%</div></div>
+      <div class="sc-card"><div class="k">缺口</div><div class="v" style="color:var(--red)">+${gap.toFixed(3)}</div><div class="n">绩点×学分<br>8 门核心课各 +${(gap/8).toFixed(3)}</div></div>
+      <div class="sc-card"><div class="k">折算成百分制（估算）</div><div class="v" style="color:var(--purple);font-size:1.5rem">+5 ~ +10 分</div><div class="n">按各科现有百分点斜率粗估<br><b style="color:var(--red)">非官方换算表，仅作方向参考</b></div></div>
+    </div>
+    <table style="margin-bottom:18px">
+      <tr><th>目标 GPA</th><th>需要 Σ(绩点×学分)</th><th>缺口</th><th>核心课需提升</th></tr>
+      ${tierRows}
+    </table>
+    <div class="sc-row">${pathCards}</div>
+    <div class="sc-note">⚠️ <b>换算限制（必须知道）</b>：学校的百分制→绩点换算<b>不是线性的</b>——心理学 90.5 只换 3.78，化学 89.5 却换 4.17，说明它按<b>课程/班内相对位置</b>给绩点。因此「要提多少分」只能给出区间，<b>真正可控的是绩点口径下的相对位置</b>：把课内排名往上推，比死磕绝对分数更有效。</div>
   `;
 })();
 </script>
