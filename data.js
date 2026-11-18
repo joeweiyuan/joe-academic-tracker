@@ -147,7 +147,11 @@ const SEMESTERS = [
     school: "光剑美高",
     overall_gpa: 3.73,
     overall_pct: 88.19,
-    gpa_note: "学校官方「阶段GPA / Periodic GPA」= 3.73（按学分加权：艺术 0.5 学分、体育 0.25 学分，其余 8 门各 1 学分，总 8.75 学分）。百分制 10 科平均 88.19。",
+    gpa_note: "学校官方「阶段GPA」= 3.73（混合满绩加权：AP 满绩 5 / Pre-AP 4.5 / 非 AP 4，按 8.75 学分加权）。若把每科按满绩折成 4 分制：学分加权 3.41、算术平均 3.48、核心 8 科（去艺术体育）3.35。百分制平均 88.19。",
+    unweighted_gpa4: 3.41,
+    unweighted_simple: 3.48,
+    core_unweighted: 3.35,
+    scale_note: "AP 满绩 5.0 ｜ Pre-AP 满绩 4.5 ｜ 非 AP 满绩 4.0",
     date: "2026年11月",
     official: true,
     scores: {
